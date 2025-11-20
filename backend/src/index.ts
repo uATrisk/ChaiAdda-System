@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { prisma } from "./prisma.js";
 import authRoutes from "./routes/auth.routes.js";
+import itemRoutes from "./routes/item.routes.js";
 
 
 
@@ -12,6 +13,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use("/auth", authRoutes);
+app.use("/items", itemRoutes);
 
 app.get("/", (req, res) => {
   res.send("Backend is running!");
