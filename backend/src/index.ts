@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import { prisma } from "./prisma.js";
 import authRoutes from "./routes/auth.routes.js";
 import itemRoutes from "./routes/item.routes.js";
-
+import orderRoutes from "./routes/order.routes.js";
 
 
 dotenv.config();
@@ -14,6 +14,8 @@ app.use(cors());
 app.use(express.json());
 app.use("/auth", authRoutes);
 app.use("/items", itemRoutes);
+app.use("/orders", orderRoutes);
+
 
 app.get("/", (req, res) => {
   res.send("Backend is running!");

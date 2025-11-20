@@ -18,32 +18,36 @@ model User {
 }
 
 model Item {
-  id        String   @id @default(uuid())
+  id        String       @id @default(uuid())
   name      String
   price     Float
-  available Boolean  @default(true)
+  available Boolean      @default(true)
   orders    OrderItem[]
 }
 
 model Order {
-  id            String        @id @default(uuid())
+  id            String          @id @default(uuid())
   studentId     String
-  student       User          @relation(fields: [studentId], references: [id])
+  student       User            @relation(fields: [studentId], references: [id])
+
   items         OrderItem[]
   amount        Float
   utr           String?
   paymentProof  String?
-  paymentStatus PaymentStatus @default(PENDING)
-  orderStatus   OrderStatus   @default(RECEIVED)
-  createdAt     DateTime      @default(now())
+  paymentStatus PaymentStatus   @default(PENDING)
+  orderStatus   OrderStatus     @default(RECEIVED)
+  createdAt     DateTime        @default(now())
 }
 
 model OrderItem {
   id      String @id @default(uuid())
+
   order   Order  @relation(fields: [orderId], references: [id])
   orderId String
+
   item    Item   @relation(fields: [itemId], references: [id])
   itemId  String
+
   qty     Int
   price   Float
 }
