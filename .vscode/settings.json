@@ -1,0 +1,12 @@
+{
+  "editor.inlineSuggest.enabled": false,
+  "editor.suggestOnTriggerCharacters": true,
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": false,
+    "strings": false
+  },
+  "editor.wordBasedSuggestions": "matchingDocuments",
+  "github.copilot.inlineSuggest.enable": false,
+  "github.copilot.enable": false
+}
