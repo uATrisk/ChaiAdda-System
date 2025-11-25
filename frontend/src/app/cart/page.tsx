@@ -12,7 +12,7 @@ export default function CartPage() {
       {cart.map((item) => (
         <div key={item.itemId} className="border p-4 my-3 rounded">
           <h2 className="text-lg font-semibold">{item.name}</h2>
-          <p>Price: ₹{item.price}</p>
+          <p>Price: INR {item.price}</p>
           <p>Qty: {item.qty}</p>
 
           <div className="mt-2 flex gap-3">
@@ -23,7 +23,7 @@ export default function CartPage() {
         </div>
       ))}
 
-      <h2 className="text-xl font-semibold mt-4">Total: ₹{total}</h2>
+      <h2 className="text-xl font-semibold mt-4">Total: INR {total}</h2>
 
       <a
         href="/checkout"

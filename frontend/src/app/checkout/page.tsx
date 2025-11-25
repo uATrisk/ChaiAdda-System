@@ -96,12 +96,12 @@ export default function CheckoutPage() {
 
         {cart.map((c) => (
           <p key={c.itemId}>
-            {c.name} × {c.qty} = ₹{c.qty * c.price}
+            {c.name} x {c.qty} = INR {c.qty * c.price}
           </p>
         ))}
 
         <h2 className="mt-4 font-semibold text-lg">
-          Total: <span className="text-green-700">₹{total}</span>
+          Total: <span className="text-green-700">INR {total}</span>
         </h2>
       </div>
 

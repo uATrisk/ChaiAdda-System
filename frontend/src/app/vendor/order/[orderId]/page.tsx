@@ -95,7 +95,7 @@ export default function VendorOrderPage({
         <h2 className="font-semibold mt-4 mb-2">Items:</h2>
         {order.items.map((item) => (
           <p key={item.id}>
-            {item.item.name} × {item.qty} = ₹{item.price}
+            {item.item.name} x {item.qty} = INR {item.price}
           </p>
         ))}
 

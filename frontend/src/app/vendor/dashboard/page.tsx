@@ -59,7 +59,7 @@ export default function VendorDashboard() {
             className="block border p-4 rounded-lg hover:bg-gray-50"
           >
             <p><strong>Order ID:</strong> {order.id}</p>
-            <p><strong>Amount:</strong> ₹{order.amount}</p>
+            <p><strong>Amount:</strong> INR {order.amount}</p>
             <p><strong>Payment:</strong> {order.paymentStatus}</p>
             <p><strong>Status:</strong> {order.orderStatus}</p>
           </a>

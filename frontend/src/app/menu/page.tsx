@@ -27,7 +27,7 @@ export default function MenuPage() {
         {items.map((item) => (
           <div key={item.id} className="border p-4 rounded">
             <h2 className="text-lg font-semibold">{item.name}</h2>
-            <p className="text-gray-600">₹{item.price}</p>
+            <p className="text-gray-600">INR {item.price}</p>
 
             <button
               disabled={!item.available}
