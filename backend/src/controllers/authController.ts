@@ -6,7 +6,7 @@ import { isCollegeEmail } from "../utils/emailValidator.js";
 
 export const signup = async (req: Request, res: Response) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
     if (!isCollegeEmail(email)) {
       return res.status(400).json({ error: "Only college email IDs are allowed" });
@@ -20,7 +20,7 @@ export const signup = async (req: Request, res: Response) => {
     const hashed = await bcrypt.hash(password, 10);
 
     const user = await prisma.user.create({
-      data: { name, email, password: hashed }
+      data: { name, email, password: hashed, role: role || "STUDENT" }
     });
 
     return res.status(201).json({

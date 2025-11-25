@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../prisma.js";
 import { AuthRequest } from "../types/auth.types.js";
+import { emitNewOrder, emitOrderUpdate } from "../utils/socketEmitter.js";
 
 export const createOrder = async (req: AuthRequest, res: Response) => {
   try {
@@ -23,12 +24,70 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
           }))
         }
       },
-      include: { items: true }
+      include: { items: true, student: true }
     });
+
+    emitNewOrder(order);
+
 
     return res.json({ message: "Order created", order });
   } catch (error) {
     console.error("Create order error:", error);
+    return res.status(500).json({ error: "Server error" });
+  }
+};
+
+export const getOrder = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const order = await prisma.order.findUnique({
+      where: { id },
+      include: { items: { include: { item: true } }, student: true }
+    });
+
+    if (!order) return res.status(404).json({ error: "Order not found" });
+
+    return res.json({ order });
+  } catch (error) {
+    console.error("Get order error:", error);
+    return res.status(500).json({ error: "Server error" });
+  }
+};
+
+export const verifyPayment = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const order = await prisma.order.update({
+      where: { id },
+      data: { paymentStatus: status, orderStatus: status === "VERIFIED" ? "IN_PROGRESS" : "RECEIVED" }
+    });
+
+    emitOrderUpdate(id, { type: status === "VERIFIED" ? "PAYMENT_VERIFIED" : "PAYMENT_REJECTED", orderId: id });
+
+    return res.json({ message: "Payment updated", order });
+  } catch (error) {
+    console.error("Verify payment error:", error);
+    return res.status(500).json({ error: "Server error" });
+  }
+};
+
+export const updateStatus = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const order = await prisma.order.update({
+      where: { id },
+      data: { orderStatus: status }
+    });
+
+    emitOrderUpdate(id, { type: "STATUS_UPDATED", status, orderId: id });
+
+    return res.json({ message: "Status updated", order });
+  } catch (error) {
+    console.error("Update status error:", error);
     return res.status(500).json({ error: "Server error" });
   }
 };
