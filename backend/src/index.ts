@@ -8,14 +8,26 @@ import { prisma } from "./prisma.js";
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:3000",
+    process.env.FRONTEND_URL || "https://your-project.vercel.app",
+    /\.vercel\.app$/
+  ],
+  credentials: true
+}));
 app.use(express.json());
 
 const server = http.createServer(app);
 
 export const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: [
+      "http://localhost:3000",
+      process.env.FRONTEND_URL || "https://your-project.vercel.app",
+      /\.vercel\.app$/
+    ],
+    credentials: true
   },
 });
 
