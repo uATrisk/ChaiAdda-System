@@ -13,43 +13,54 @@ model User {
   email     String   @unique
   password  String
   role      Role     @default(STUDENT)
-  orders    Order[]
   createdAt DateTime @default(now())
+  orders    Order[]
+  reviews   Review[]
 }
 
 model Item {
-  id        String       @id @default(uuid())
+  id        String      @id @default(uuid())
   name      String
   price     Float
-  available Boolean      @default(true)
+  available Boolean     @default(true)
+  category  String      @default("Other")
+  image     String?
   orders    OrderItem[]
+  reviews   Review[]
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  rating    Int
+  comment   String?
+  userId    String
+  itemId    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  item      Item     @relation(fields: [itemId], references: [id])
 }
 
 model Order {
-  id            String          @id @default(uuid())
+  id            String        @id @default(uuid())
   studentId     String
-  student       User            @relation(fields: [studentId], references: [id])
-
-  items         OrderItem[]
   amount        Float
   utr           String?
   paymentProof  String?
-  paymentStatus PaymentStatus   @default(PENDING)
-  orderStatus   OrderStatus     @default(RECEIVED)
-  createdAt     DateTime        @default(now())
+  paymentStatus PaymentStatus @default(PENDING)
+  orderStatus   OrderStatus   @default(RECEIVED)
+  createdAt     DateTime      @default(now())
+  student       User          @relation(fields: [studentId], references: [id])
+  items         OrderItem[]
 }
 
 model OrderItem {
   id      String @id @default(uuid())
-
-  order   Order  @relation(fields: [orderId], references: [id])
   orderId String
-
-  item    Item   @relation(fields: [itemId], references: [id])
   itemId  String
-
   qty     Int
   price   Float
+  item    Item   @relation(fields: [itemId], references: [id])
+  order   Order  @relation(fields: [orderId], references: [id])
 }
 
 enum Role {

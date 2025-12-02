@@ -1,0 +1,150 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { apiGet, apiPut, apiDelete } from "@/lib/api";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, User, Edit2, Trash2, Star } from "lucide-react";
+import Link from "next/link";
+
+interface Review {
+    id: string;
+    rating: number;
+    comment: string;
+    item: { name: string };
+    itemId: string;
+    createdAt: string;
+}
+
+export default function ProfilePage() {
+    const router = useRouter();
+    const [user, setUser] = useState<{ id: string; name: string; email: string; role: string } | null>(null);
+    const [reviews, setReviews] = useState<Review[]>([]);
+    const [isEditing, setIsEditing] = useState(false);
+    const [newName, setNewName] = useState("");
+
+    useEffect(() => {
+        const userStr = localStorage.getItem("user");
+        if (!userStr) {
+            router.push("/login");
+            return;
+        }
+        const userData = JSON.parse(userStr);
+        setUser(userData);
+        setNewName(userData.name);
+
+
+
+        apiGet("/reviews/user/me")
+            .then((data) => {
+                if (Array.isArray(data)) {
+                    setReviews(data);
+                } else {
+                    console.error("Reviews data is not an array:", data);
+                    setReviews([]);
+                }
+            })
+            .catch((err) => {
+                console.error("Failed to fetch reviews", err);
+                setReviews([]);
+            });
+    }, []);
+
+    const handleUpdateProfile = async () => {
+        try {
+            const res = await apiPut("/auth/profile", { name: newName });
+            if (res.user) {
+                localStorage.setItem("user", JSON.stringify(res.user));
+                setUser(res.user);
+                setIsEditing(false);
+                alert("Profile updated successfully!");
+            } else {
+                alert("Failed to update profile");
+            }
+        } catch (error) {
+            console.error("Update profile error:", error);
+            alert("Failed to update profile");
+        }
+    };
+
+    return (
+        <div className="min-h-screen bg-brand-bg font-sans p-4 md:p-8 max-w-4xl mx-auto">
+            <header className="flex items-center gap-4 mb-8">
+                <Link href="/menu" className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-brand-dark hover:bg-brand-orange hover:text-white transition-colors shadow-sm">
+                    <ArrowLeft size={20} />
+                </Link>
+                <h1 className="text-2xl font-black text-brand-dark tracking-tight">MY PROFILE</h1>
+            </header>
+
+            <div className="bg-white rounded-[2.5rem] p-8 shadow-sm border border-gray-100 mb-8">
+                <div className="flex items-center gap-6 mb-6">
+                    <div className="w-20 h-20 bg-brand-orange/10 rounded-full flex items-center justify-center text-brand-orange">
+                        <User size={40} />
+                    </div>
+                    <div className="flex-1">
+                        {isEditing ? (
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={newName}
+                                    onChange={(e) => setNewName(e.target.value)}
+                                    className="px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-orange"
+                                />
+                                <button
+                                    onClick={handleUpdateProfile}
+                                    className="bg-brand-dark text-white px-4 py-2 rounded-xl font-bold hover:bg-brand-orange transition-colors"
+                                >
+                                    Save
+                                </button>
+                                <button
+                                    onClick={() => setIsEditing(false)}
+                                    className="bg-gray-100 text-gray-600 px-4 py-2 rounded-xl font-bold hover:bg-gray-200 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        ) : (
+                            <div>
+                                <h2 className="text-2xl font-bold text-brand-dark">{user?.name}</h2>
+                                <p className="text-gray-500">{user?.email}</p>
+                            </div>
+                        )}
+                    </div>
+                    {!isEditing && (
+                        <button
+                            onClick={() => setIsEditing(true)}
+                            className="p-2 text-gray-400 hover:text-brand-orange transition-colors"
+                        >
+                            <Edit2 size={20} />
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            <h2 className="text-xl font-black text-brand-dark mb-4 px-2">MY REVIEWS</h2>
+            <div className="space-y-4">
+                {reviews.length === 0 ? (
+                    <p className="text-gray-500 text-center py-8 bg-white rounded-[2rem]">You haven't written any reviews yet.</p>
+                ) : (
+                    reviews.map((review) => (
+                        <div key={review.id} className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100">
+                            <div className="flex justify-between items-start mb-2">
+                                <h3 className="font-bold text-brand-dark">{review.item.name}</h3>
+                                <div className="flex text-yellow-400 text-sm">
+                                    {Array.from({ length: review.rating }).map((_, i) => (
+                                        <span key={i}>★</span>
+                                    ))}
+                                </div>
+                            </div>
+                            <p className="text-gray-600 mb-4">{review.comment}</p>
+                            <div className="flex justify-end gap-2">
+                                <button className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors">
+                                    <Trash2 size={16} />
+                                </button>
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+        </div>
+    );
+}

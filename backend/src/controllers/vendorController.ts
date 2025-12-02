@@ -6,7 +6,7 @@ import { emitOrderUpdate } from "../utils/socketEmitter.js";
 export const getAllOrders = async (req: AuthRequest, res: Response) => {
   try {
     const orders = await prisma.order.findMany({
-      include: { items: true, student: true },
+      include: { items: { include: { item: true } }, student: true },
       orderBy: { createdAt: "desc" }
     });
 
@@ -21,7 +21,7 @@ export const getPendingPayments = async (req: AuthRequest, res: Response) => {
   try {
     const orders = await prisma.order.findMany({
       where: { paymentStatus: "PENDING" },
-      include: { items: true, student: true }
+      include: { items: { include: { item: true } }, student: true }
     });
 
     return res.json(orders);

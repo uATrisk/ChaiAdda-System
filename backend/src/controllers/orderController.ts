@@ -24,7 +24,7 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
           }))
         }
       },
-      include: { items: true, student: true }
+      include: { items: { include: { item: true } }, student: true }
     });
 
     emitNewOrder(order);
@@ -33,6 +33,22 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
     return res.json({ message: "Order created", order });
   } catch (error) {
     console.error("Create order error:", error);
+    return res.status(500).json({ error: "Server error" });
+  }
+};
+
+export const getMyOrders = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const orders = await prisma.order.findMany({
+      where: { studentId: userId },
+      include: { items: { include: { item: true } } },
+      orderBy: { createdAt: "desc" }
+    });
+
+    return res.json(orders);
+  } catch (error) {
+    console.error("Get my orders error:", error);
     return res.status(500).json({ error: "Server error" });
   }
 };

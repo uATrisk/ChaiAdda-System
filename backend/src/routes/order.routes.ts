@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import { auth } from "../middleware/auth.js";
-import { createOrder, getOrder, verifyPayment, updateStatus } from "../controllers/orderController.js";
+import { createOrder, getOrder, verifyPayment, updateStatus, getMyOrders } from "../controllers/orderController.js";
 import { upload } from "../utils/upload.js";
 import { prisma } from "../prisma.js";
 
@@ -8,6 +8,7 @@ const router = express.Router();
 
 
 router.post("/", auth(["STUDENT", "ADMIN"]), createOrder);
+router.get("/my-orders", auth(["STUDENT", "ADMIN"]), getMyOrders);
 router.get("/:id", auth(["STUDENT", "ADMIN"]), getOrder);
 router.put("/:id/verify-payment", auth(["ADMIN"]), verifyPayment);
 router.put("/:id/status", auth(["ADMIN"]), updateStatus);

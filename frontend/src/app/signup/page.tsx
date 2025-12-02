@@ -1,87 +1,66 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { API_URL } from "@/lib/api";
+import Link from "next/link";
+import { Coffee, Store, User } from "lucide-react";
 
-export default function SignupPage() {
-    const router = useRouter();
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
-
-    const handleSignup = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError("");
-
-        try {
-            const res = await fetch(`${API_URL}/auth/signup`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, email, password }),
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                setError(data.error || "Signup failed");
-                return;
-            }
-
-            alert("Signup successful! Please login.");
-            router.push("/login");
-        } catch (err) {
-            setError("Network error");
-        }
-    };
-
+export default function SignupSelectionPage() {
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-50">
-            <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
-                <h1 className="text-2xl font-bold text-center">Sign Up for Chai Adda</h1>
-                {error && <p className="text-red-500 text-center">{error}</p>}
-                <form onSubmit={handleSignup} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Name</label>
-                        <input
-                            type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className="w-full px-3 py-2 mt-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            required
-                        />
+        <div className="min-h-screen flex bg-brand-bg font-sans">
+            {/* Left Side - Brand */}
+            <div className="hidden lg:flex lg:w-1/2 bg-brand-yellow relative items-center justify-center overflow-hidden">
+                <div className="absolute inset-0 bg-brand-orange/20 mix-blend-multiply"></div>
+                <div className="relative z-10 text-center p-12">
+                    <div className="w-32 h-32 bg-white rounded-full flex items-center justify-center text-brand-dark mx-auto mb-8 shadow-xl animate-bounce-slow">
+                        <Coffee size={64} />
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Email (College ID)</label>
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-3 py-2 mt-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            required
-                        />
+                    <h1 className="text-6xl font-black text-brand-dark mb-4 tracking-tight">CHAI ADDA</h1>
+                    <p className="text-2xl text-brand-dark/80 font-bold">Join the community.</p>
+                </div>
+                <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-white/20 rounded-full blur-3xl"></div>
+                <div className="absolute -top-20 -right-20 w-80 h-80 bg-brand-blue/20 rounded-full blur-3xl"></div>
+            </div>
+
+            {/* Right Side - Selection */}
+            <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12 bg-white lg:rounded-l-[3rem] shadow-2xl z-10">
+                <div className="w-full max-w-md space-y-8">
+                    <div className="text-center lg:text-left">
+                        <h2 className="text-4xl font-black text-brand-dark mb-2">Create Account</h2>
+                        <p className="text-gray-400 text-lg">Choose your role to get started.</p>
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Password</label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-3 py-2 mt-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            required
-                        />
+
+                    <div className="space-y-4">
+                        <Link href="/signup/student" className="block group">
+                            <div className="flex items-center gap-6 p-6 rounded-2xl border-2 border-gray-100 hover:border-brand-orange hover:bg-brand-yellow/10 transition-all cursor-pointer">
+                                <div className="w-16 h-16 bg-brand-yellow/20 rounded-full flex items-center justify-center text-brand-dark group-hover:scale-110 transition-transform">
+                                    <User size={32} />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-brand-dark">Student Signup</h3>
+                                    <p className="text-gray-400 text-sm">Create a student account</p>
+                                </div>
+                            </div>
+                        </Link>
+
+                        <Link href="/signup/vendor" className="block group">
+                            <div className="flex items-center gap-6 p-6 rounded-2xl border-2 border-gray-100 hover:border-brand-dark hover:bg-gray-50 transition-all cursor-pointer">
+                                <div className="w-16 h-16 bg-brand-dark/10 rounded-full flex items-center justify-center text-brand-dark group-hover:scale-110 transition-transform">
+                                    <Store size={32} />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-brand-dark">Vendor Signup</h3>
+                                    <p className="text-gray-400 text-sm">Register your business</p>
+                                </div>
+                            </div>
+                        </Link>
                     </div>
-                    <button
-                        type="submit"
-                        className="w-full px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none"
-                    >
-                        Sign Up
-                    </button>
-                </form>
-                <p className="text-center text-sm">
-                    Already have an account? <a href="/login" className="text-blue-600 hover:underline">Login</a>
-                </p>
+
+                    <p className="text-center text-gray-500 font-medium">
+                        Already have an account?{" "}
+                        <Link href="/login" className="text-brand-orange font-bold hover:underline">
+                            Login
+                        </Link>
+                    </p>
+                </div>
             </div>
         </div>
     );

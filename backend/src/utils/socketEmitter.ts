@@ -7,3 +7,7 @@ export const emitOrderUpdate = (orderId: string, data: any) => {
 export const emitNewOrder = (order: any) => {
   io.emit("new-order", order);
 };
+
+export const emitItemUpdate = (item: any) => {
+  io.emit("item-updated", item);
+};

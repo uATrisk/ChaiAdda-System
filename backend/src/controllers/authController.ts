@@ -6,10 +6,14 @@ import { isCollegeEmail } from "../utils/emailValidator.js";
 
 export const signup = async (req: Request, res: Response) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role: requestedRole } = req.body;
 
-    if (!isCollegeEmail(email)) {
-      return res.status(400).json({ error: "Only college email IDs are allowed" });
+    let role = "STUDENT";
+
+    if (requestedRole === "ADMIN") {
+      role = "ADMIN";
+    } else {
+      role = "STUDENT";
     }
 
     const existing = await prisma.user.findUnique({ where: { email } });
@@ -20,12 +24,12 @@ export const signup = async (req: Request, res: Response) => {
     const hashed = await bcrypt.hash(password, 10);
 
     const user = await prisma.user.create({
-      data: { name, email, password: hashed, role: role || "STUDENT" }
+      data: { name, email, password: hashed, role: role as any }
     });
 
     return res.status(201).json({
       message: "Signup successful",
-      user: { id: user.id, name: user.name, email: user.email }
+      user: { id: user.id, name: user.name, email: user.email, role: user.role }
     });
   } catch (error) {
     console.error("Signup error:", error);
@@ -37,9 +41,6 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    if (!isCollegeEmail(email)) {
-      return res.status(400).json({ error: "Only college email IDs are allowed" });
-    }
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) return res.status(400).json({ error: "Email not registered" });
@@ -60,6 +61,28 @@ export const login = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Login error:", error);
+    return res.status(500).json({ error: "Server error" });
+  }
+};
+
+export const updateProfile = async (req: any, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+    const { name } = req.body;
+
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: { name },
+    });
+
+    return res.json({
+      message: "Profile updated",
+      user: { id: user.id, name: user.name, email: user.email, role: user.role }
+    });
+  } catch (error) {
+    console.error("Update profile error:", error);
     return res.status(500).json({ error: "Server error" });
   }
 };

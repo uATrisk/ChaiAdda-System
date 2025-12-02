@@ -15,6 +15,7 @@ interface CartContextProps {
   removeFromCart: (itemId: string) => void;
   increaseQty: (itemId: string) => void;
   decreaseQty: (itemId: string) => void;
+  clearCart: () => void;
   total: number;
 }
 
@@ -76,6 +77,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
+  const clearCart = () => {
+    setCart([]);
+  };
+
   const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
 
   return (
@@ -86,6 +91,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         removeFromCart,
         increaseQty,
         decreaseQty,
+        clearCart,
         total,
       }}
     >

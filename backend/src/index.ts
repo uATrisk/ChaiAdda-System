@@ -36,11 +36,13 @@ import authRoutes from "./routes/auth.routes.js";
 import itemRoutes from "./routes/item.routes.js";
 import orderRoutes from "./routes/order.routes.js";
 import vendorRoutes from "./routes/vendor.routes.js";
+import reviewRoutes from "./routes/review.routes.js";
 
 app.use("/auth", authRoutes);
 app.use("/items", itemRoutes);
 app.use("/orders", orderRoutes);
 app.use("/vendor", vendorRoutes);
+app.use("/reviews", reviewRoutes);
 app.use("/uploads", express.static("uploads"));
 
 
