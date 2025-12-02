@@ -3,6 +3,7 @@
   "compilerOptions": {
     /* Output Settings */
     "outDir": "./dist",
+    "rootDir": "./src",
     /* Environment */
     "target": "esnext",
     "module": "esnext",
@@ -24,8 +25,11 @@
   "ts-node": {
     "esm": true
   },
+  "include": [
+    "src/**/*"
+  ],
   "exclude": [
-    "scripts",
+    "node_modules",
     "dist"
   ]
 }
