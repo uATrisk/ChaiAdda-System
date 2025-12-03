@@ -73,12 +73,12 @@ export default function Navbar() {
                                     </div>
                                     <div className="p-2 space-y-1">
                                         <Link
-                                            href="/orders"
+                                            href="/student/profile"
                                             className="flex items-center gap-3 px-4 py-2 text-sm font-bold text-gray-600 hover:bg-gray-50 rounded-xl transition-colors"
                                             onClick={() => setIsProfileOpen(false)}
                                         >
-                                            <ShoppingBag size={16} />
-                                            My Orders
+                                            <User size={16} />
+                                            My Profile
                                         </Link>
                                         {user.role === "ADMIN" && (
                                             <Link

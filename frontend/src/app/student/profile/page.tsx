@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiGet, apiPut, apiDelete } from "@/lib/api";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, User, Edit2, Trash2, Star } from "lucide-react";
+import { ArrowLeft, User, Edit2, Trash2, Star, LogOut } from "lucide-react";
 import Link from "next/link";
 
 interface Review {
@@ -216,19 +216,8 @@ export default function ProfilePage() {
                 )}
             </div>
 
-            <div className="bg-white rounded-[2.5rem] p-6 shadow-sm border border-red-100 mb-8">
-                <h3 className="text-lg font-bold text-red-600 mb-2">Danger Zone</h3>
-                <p className="text-gray-600 text-sm mb-4">Once you delete your account, there is no going back. Please be certain.</p>
-                <button
-                    onClick={handleDeleteAccount}
-                    className="bg-red-500 text-white px-6 py-2 rounded-xl font-bold hover:bg-red-600 transition-colors"
-                >
-                    Delete Account
-                </button>
-            </div>
-
             <h2 className="text-xl font-black text-brand-dark mb-4 px-2">MY REVIEWS</h2>
-            <div className="space-y-4">
+            <div className="space-y-4 mb-8">
                 {reviews.length === 0 ? (
                     <p className="text-gray-500 text-center py-8 bg-white rounded-[2rem]">You haven't written any reviews yet.</p>
                 ) : (
@@ -254,6 +243,31 @@ export default function ProfilePage() {
                         </div>
                     ))
                 )}
+            </div>
+
+            <div className="flex flex-col gap-4">
+                <button
+                    onClick={() => {
+                        localStorage.removeItem("token");
+                        localStorage.removeItem("user");
+                        router.push("/login");
+                    }}
+                    className="bg-gray-100 text-brand-dark w-full py-4 rounded-[2rem] font-bold hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+                >
+                    <LogOut size={20} />
+                    Logout
+                </button>
+
+                <div className="bg-white rounded-[2.5rem] p-6 shadow-sm border border-red-100">
+                    <h3 className="text-lg font-bold text-red-600 mb-2">Danger Zone</h3>
+                    <p className="text-gray-600 text-sm mb-4">Once you delete your account, there is no going back. Please be certain.</p>
+                    <button
+                        onClick={handleDeleteAccount}
+                        className="bg-red-500 text-white px-6 py-2 rounded-xl font-bold hover:bg-red-600 transition-colors w-full"
+                    >
+                        Delete Account
+                    </button>
+                </div>
             </div>
         </div>
     );
