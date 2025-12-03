@@ -66,6 +66,21 @@ export default function ProfilePage() {
         }
     };
 
+    const handleDeleteReview = async (reviewId: string) => {
+        if (!confirm("Are you sure you want to delete this review?")) {
+            return;
+        }
+
+        try {
+            await apiDelete(`/reviews/${reviewId}`);
+            setReviews(reviews.filter(r => r.id !== reviewId));
+            alert("Review deleted successfully!");
+        } catch (error) {
+            console.error("Delete review error:", error);
+            alert("Failed to delete review");
+        }
+    };
+
     return (
         <div className="min-h-screen bg-brand-bg font-sans p-4 md:p-8 max-w-4xl mx-auto">
             <header className="flex items-center gap-4 mb-8">
@@ -137,7 +152,10 @@ export default function ProfilePage() {
                             </div>
                             <p className="text-gray-600 mb-4">{review.comment}</p>
                             <div className="flex justify-end gap-2">
-                                <button className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors">
+                                <button
+                                    onClick={() => handleDeleteReview(review.id)}
+                                    className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors"
+                                >
                                     <Trash2 size={16} />
                                 </button>
                             </div>
