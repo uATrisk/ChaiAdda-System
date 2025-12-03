@@ -222,7 +222,7 @@ export default function MenuPage() {
                     </h2>
                     {item.rating !== undefined && item.rating > 0 && (
                       <div className="flex items-center gap-1 mt-1">
-                        <span className="text-yellow-400 text-sm">★</span>
+                        <Star size={14} className="text-yellow-400 fill-current" />
                         <span className="text-gray-600 text-sm font-bold">{item.rating.toFixed(1)}</span>
                         <span className="text-gray-400 text-xs">({item.reviews?.length || 0})</span>
                       </div>
@@ -237,9 +237,10 @@ export default function MenuPage() {
 
                 <button
                   onClick={() => handleOpenReviews(item)}
-                  className="text-brand-orange text-sm font-bold flex items-center gap-1 mb-4 hover:underline"
+                  className="w-full py-2 mb-3 bg-brand-orange/10 text-brand-orange rounded-xl font-bold hover:bg-brand-orange/20 transition-colors flex items-center justify-center gap-2"
                 >
-                  <Star size={14} /> Reviews
+                  <Star size={16} />
+                  {item.reviews?.length ? `See ${item.reviews.length} Reviews` : "Write a Review"}
                 </button>
               </div>
 
@@ -301,7 +302,7 @@ export default function MenuPage() {
                     onClick={() => setNewReview({ ...newReview, rating: star })}
                     className={`text-2xl ${star <= newReview.rating ? "text-yellow-400" : "text-gray-300"}`}
                   >
-                    ★
+                    <Star size={24} fill="currentColor" />
                   </button>
                 ))}
               </div>
@@ -331,7 +332,7 @@ export default function MenuPage() {
                       <span className="font-bold text-brand-dark">{review.user.name}</span>
                       <div className="flex text-yellow-400 text-sm">
                         {Array.from({ length: review.rating }).map((_, i) => (
-                          <span key={i}>★</span>
+                          <Star key={i} size={14} className="fill-current" />
                         ))}
                       </div>
                     </div>

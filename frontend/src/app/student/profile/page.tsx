@@ -180,7 +180,10 @@ export default function ProfilePage() {
                         <div key={order.id} className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex justify-between items-center">
                             <div>
                                 <p className="font-bold text-brand-dark mb-1">Order #{order.id.slice(0, 8)}</p>
-                                <p className="text-sm text-gray-500">{new Date(order.createdAt).toLocaleDateString()} • ₹{order.amount}</p>
+                                <p className="text-sm text-gray-600 mb-1">
+                                    {order.items.map((i: any) => `${i.qty}x ${i.item.name}`).join(", ")}
+                                </p>
+                                <p className="text-xs text-gray-400">{new Date(order.createdAt).toLocaleDateString()} • ₹{order.amount}</p>
                                 <div className="flex gap-2 mt-2">
                                     <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-lg">{order.orderStatus}</span>
                                     <span className={`text-xs font-bold px-2 py-1 rounded-lg ${order.paymentStatus === 'VERIFIED' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
@@ -207,7 +210,10 @@ export default function ProfilePage() {
                             <div className="flex justify-between items-center">
                                 <div>
                                     <p className="font-bold text-brand-dark mb-1">Order #{order.id.slice(0, 8)}</p>
-                                    <p className="text-sm text-gray-500">{new Date(order.createdAt).toLocaleDateString()} • ₹{order.amount}</p>
+                                    <p className="text-sm text-gray-600 mb-1">
+                                        {order.items.map((i: any) => `${i.qty}x ${i.item.name}`).join(", ")}
+                                    </p>
+                                    <p className="text-xs text-gray-400">{new Date(order.createdAt).toLocaleDateString()} • ₹{order.amount}</p>
                                 </div>
                                 <span className="text-xs font-bold bg-gray-100 text-gray-700 px-3 py-1 rounded-lg">{order.orderStatus}</span>
                             </div>
