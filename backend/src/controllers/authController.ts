@@ -86,3 +86,47 @@ export const updateProfile = async (req: any, res: Response) => {
     return res.status(500).json({ error: "Server error" });
   }
 };
+
+export const deleteAccount = async (req: any, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+    // Delete in order to respect foreign key constraints
+
+    // 1. Delete user's reviews
+    await prisma.review.deleteMany({
+      where: { userId }
+    });
+
+    // 2. Get user's orders
+    const orders = await prisma.order.findMany({
+      where: { studentId: userId },
+      select: { id: true }
+    });
+    const orderIds = orders.map(o => o.id);
+
+    // 3. Delete order items
+    if (orderIds.length > 0) {
+      await prisma.orderItem.deleteMany({
+        where: { orderId: { in: orderIds } }
+      });
+    }
+
+    // 4. Delete orders
+    await prisma.order.deleteMany({
+      where: { studentId: userId }
+    });
+
+    // 5. Finally delete the user
+    await prisma.user.delete({
+      where: { id: userId }
+    });
+
+    return res.json({ message: "Account deleted successfully" });
+  } catch (error) {
+    console.error("Delete account error:", error);
+    return res.status(500).json({ error: "Server error" });
+  }
+};

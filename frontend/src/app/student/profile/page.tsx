@@ -81,6 +81,27 @@ export default function ProfilePage() {
         }
     };
 
+    const handleDeleteAccount = async () => {
+        if (!confirm("⚠️ Are you sure you want to delete your account? This action cannot be undone and will delete all your orders and reviews.")) {
+            return;
+        }
+
+        if (!confirm("This is your final warning. Your account will be permanently deleted. Continue?")) {
+            return;
+        }
+
+        try {
+            await apiDelete("/auth/account");
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            alert("Account deleted successfully");
+            router.push("/login");
+        } catch (error) {
+            console.error("Delete account error:", error);
+            alert("Failed to delete account");
+        }
+    };
+
     return (
         <div className="min-h-screen bg-brand-bg font-sans p-4 md:p-8 max-w-4xl mx-auto">
             <header className="flex items-center gap-4 mb-8">
@@ -133,6 +154,17 @@ export default function ProfilePage() {
                         </button>
                     )}
                 </div>
+            </div>
+
+            <div className="bg-white rounded-[2.5rem] p-6 shadow-sm border border-red-100 mb-8">
+                <h3 className="text-lg font-bold text-red-600 mb-2">Danger Zone</h3>
+                <p className="text-gray-600 text-sm mb-4">Once you delete your account, there is no going back. Please be certain.</p>
+                <button
+                    onClick={handleDeleteAccount}
+                    className="bg-red-500 text-white px-6 py-2 rounded-xl font-bold hover:bg-red-600 transition-colors"
+                >
+                    Delete Account
+                </button>
             </div>
 
             <h2 className="text-xl font-black text-brand-dark mb-4 px-2">MY REVIEWS</h2>
