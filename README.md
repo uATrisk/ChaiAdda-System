@@ -2,6 +2,13 @@
 
 A modern, full-stack web application designed to streamline order management for college canteens. Built with Next.js, Node.js, and PostgreSQL, featuring real-time updates and a beautiful, responsive UI.
 
+## 🌐 Live Demo
+
+- **Frontend**: [https://chai-adda-system.vercel.app/](https://chai-adda-system.vercel.app/)
+- **Backend API**: [https://chaiadda-system.onrender.com](https://chaiadda-system.onrender.com)
+
+> **Note**: The backend is hosted on Render's free tier and may take 50+ seconds to spin up after inactivity.
+
 ## ✨ Features
 
 ### For Students
@@ -24,9 +31,10 @@ A modern, full-stack web application designed to streamline order management for
 ### Frontend
 - **Framework**: Next.js 16.0.3 (with Turbopack)
 - **Language**: TypeScript
-- **Styling**: Tailwind CSS
+- **Styling**: Tailwind CSS v4
 - **Real-time**: Socket.io Client
 - **Icons**: Lucide React
+- **Deployment**: Vercel
 
 ### Backend
 - **Runtime**: Node.js
@@ -37,6 +45,7 @@ A modern, full-stack web application designed to streamline order management for
 - **Authentication**: JWT
 - **Real-time**: Socket.io
 - **File Upload**: Multer
+- **Deployment**: Render
 
 ## 📦 Installation
 
@@ -58,13 +67,11 @@ cd backend
 # Install dependencies
 npm install
 
-# Create .env file
-cp .env.example .env
-
-# Update .env with your database credentials:
+# Create .env file with the following variables:
 # DATABASE_URL="postgresql://user:password@localhost:5432/chaiadda"
 # JWT_SECRET="your-secret-key"
 # PORT=8000
+# FRONTEND_URL="http://localhost:3000"
 
 # Generate Prisma Client
 npx prisma generate
@@ -106,7 +113,7 @@ npm run dev
 - Password: `1234567890`
 
 **Student Account:**
-- Sign up at: http://localhost:3000/signup/student
+- Sign up at: [/signup/student](https://chai-adda-system.vercel.app/signup/student)
 
 ### Key Workflows
 
@@ -125,23 +132,23 @@ ChaiAdda-System/
 │   │   ├── schema.prisma
 │   │   └── migrations/
 │   ├── src/
-│   │   ├── controllers/
-│   │   ├── middleware/
-│   │   ├── routes/
-│   │   ├── types/
-│   │   └── utils/
-│   └── uploads/
+│   │   ├── controllers/      # Business logic
+│   │   ├── middleware/       # Auth & upload middleware
+│   │   ├── routes/           # API routes
+│   │   ├── types/            # TypeScript types
+│   │   └── utils/            # Helper functions
+│   └── uploads/              # Payment proof images
 ├── frontend/
 │   ├── public/
 │   ├── src/
 │   │   ├── app/
-│   │   │   ├── login/
-│   │   │   ├── signup/
-│   │   │   ├── menu/
-│   │   │   ├── vendor/
-│   │   │   └── student/
-│   │   ├── components/
-│   │   └── lib/
+│   │   │   ├── login/        # Login page
+│   │   │   ├── signup/       # Student signup
+│   │   │   ├── menu/         # Public menu
+│   │   │   ├── vendor/       # Vendor dashboard
+│   │   │   └── student/      # Student dashboard
+│   │   ├── components/       # Reusable components
+│   │   └── lib/              # API & Socket utilities
 │   └── tailwind.config.ts
 └── README.md
 ```
@@ -178,9 +185,33 @@ ChaiAdda-System/
 - CORS configuration
 - Input validation
 
+## 🚢 Deployment
+
+### Frontend (Vercel)
+1. Connect your GitHub repository to Vercel
+2. Set Framework Preset to **Next.js**
+3. Set Root Directory to `frontend`
+4. Add environment variable:
+   - `NEXT_PUBLIC_API_URL` = `https://chaiadda-system.onrender.com`
+5. Deploy
+
+### Backend (Render)
+1. Connect your GitHub repository to Render
+2. Set Root Directory to `backend`
+3. Build Command: `npm install && npm run build`
+4. Start Command: `npm start`
+5. Add environment variables:
+   - `DATABASE_URL` - PostgreSQL connection string
+   - `JWT_SECRET` - Your JWT secret
+   - `FRONTEND_URL` - `https://chai-adda-system.vercel.app`
+6. Deploy
+
+For detailed deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
+
 ## 🐛 Known Issues & Solutions
 
 All major issues have been resolved:
+- ✅ Fixed TypeScript build errors on Render
 - ✅ Fixed "Order not found" error on vendor order page
 - ✅ Fixed "Unknown Item" display in dashboard
 - ✅ Fixed missing UTR number display
@@ -212,7 +243,7 @@ This project is licensed under the MIT License.
 ## 📞 Support
 
 For issues and questions:
-- Open an issue on GitHub
+- Open an issue on [GitHub](https://github.com/uATrisk/ChaiAdda-System/issues)
 - Contact: anshtomarnew@gmail.com
 
 ---
