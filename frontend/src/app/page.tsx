@@ -59,7 +59,7 @@ export default function Home() {
                 10% OFF
               </h2>
               <p className="text-brand-dark/80 font-bold text-lg">
-                For Rishihood Students 🎓
+                For Rishihood Students
               </p>
             </div>
 
@@ -156,7 +156,7 @@ export default function Home() {
 
       <div className="bg-brand-dark rounded-[3rem] p-8 md:p-16 text-center relative overflow-hidden">
         <div className="relative z-10">
-          <h2 className="text-3xl md:text-5xl font-black text-white mb-12">CAMPUS VIBES 💬</h2>
+          <h2 className="text-3xl md:text-5xl font-black text-white mb-12">CAMPUS VIBES</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               { text: "The Bun Maska here is literally a lifesaver during morning lectures!", author: "Priya, MBA" },

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { socket } from "@/lib/socket";
 import { API_URL } from "@/lib/api";
 import Link from "next/link";
+import { Receipt, Camera } from "lucide-react";
 
 interface OrderPageProps {
   params: {
@@ -68,8 +69,8 @@ export default function OrderStatusPage({ params }: OrderPageProps) {
         <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-yellow via-brand-orange to-brand-blue"></div>
 
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-brand-dark text-white rounded-full flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg">
-            🧾
+          <div className="w-16 h-16 bg-brand-dark text-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <Receipt size={32} />
           </div>
           <h1 className="text-2xl font-black text-brand-dark mb-1">Order Receipt</h1>
           <p className="text-gray-400 text-sm font-mono">{orderId}</p>
@@ -91,7 +92,7 @@ export default function OrderStatusPage({ params }: OrderPageProps) {
           <div className="flex justify-between items-center border-b border-gray-100 pb-4">
             <span className="font-bold text-gray-600">Payment Status</span>
             <span className={`font-black ${paymentStatus === "VERIFIED" ? "text-green-500" :
-                paymentStatus === "FAILED" ? "text-red-500" : "text-brand-orange"
+              paymentStatus === "FAILED" ? "text-red-500" : "text-brand-orange"
               }`}>
               {paymentStatus}
             </span>
@@ -101,7 +102,7 @@ export default function OrderStatusPage({ params }: OrderPageProps) {
           {paymentStatus === "PENDING" && (
             <div className="bg-brand-blue/10 rounded-2xl p-6 border border-brand-blue/20">
               <h2 className="font-bold text-brand-dark mb-2 flex items-center gap-2">
-                <span>📸</span> Upload Payment Proof
+                <Camera size={20} className="inline mr-2" />Upload Payment Proof
               </h2>
               <p className="text-sm text-gray-600 mb-4">
                 Forgot to upload screenshot? Do it here.

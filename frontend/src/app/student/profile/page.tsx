@@ -82,7 +82,7 @@ export default function ProfilePage() {
     };
 
     const handleDeleteAccount = async () => {
-        if (!confirm("⚠️ Are you sure you want to delete your account? This action cannot be undone and will delete all your orders and reviews.")) {
+        if (!confirm("Are you sure you want to delete your account? This action cannot be undone and will delete all your orders and reviews.")) {
             return;
         }
 

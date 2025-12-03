@@ -1,32 +1,32 @@
-# 🍵 Chai Adda - College Canteen Management System
+# Chai Adda - College Canteen Management System
 
 A modern, full-stack web application designed to streamline order management for college canteens. Built with Next.js, Node.js, and PostgreSQL, featuring real-time updates and a beautiful, responsive UI.
 
-## 🌐 Live Demo
+## Live Demo
 
 - **Frontend**: [https://chai-adda-system.vercel.app/](https://chai-adda-system.vercel.app/)
 - **Backend API**: [https://chaiadda-system.onrender.com](https://chaiadda-system.onrender.com)
 
 > **Note**: The backend is hosted on Render's free tier and may take 50+ seconds to spin up after inactivity.
 
-## ✨ Features
+## Features
 
 ### For Students
-- 📱 **Browse Menu** - View all available items with ratings and reviews
-- ⭐ **Rate & Review** - Share feedback on items you've ordered
-- 🛒 **Place Orders** - Easy ordering with UPI payment proof upload
-- 📊 **Order Tracking** - Real-time status updates on your orders
-- 👤 **Profile Management** - View and manage your reviews
+- **Browse Menu** - View all available items with ratings and reviews
+- **Rate & Review** - Share feedback on items you've ordered
+- **Place Orders** - Easy ordering with UPI payment proof upload
+- **Order Tracking** - Real-time status updates on your orders
+- **Profile Management** - View and manage your reviews
 
 ### For Vendors
-- 📋 **Dashboard** - Comprehensive overview of orders and revenue
-- 🍽️ **Menu Management** - Add, edit, and manage menu items with pagination
-- ✅ **Order Processing** - Accept, prepare, and complete orders
-- 💰 **Payment Verification** - Verify payment proofs and manage transactions
-- 📈 **Analytics** - View sales trends and top-selling items
-- ⭐ **Review Insights** - See customer ratings and feedback
+- **Dashboard** - Comprehensive overview of orders and revenue
+- **Menu Management** - Add, edit, and manage menu items with pagination
+- **Order Processing** - Accept, prepare, and complete orders
+- **Payment Verification** - Verify payment proofs and manage transactions
+- **Analytics** - View sales trends and top-selling items
+- **Review Insights** - See customer ratings and feedback
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend
 - **Framework**: Next.js 16.0.3 (with Turbopack)
@@ -47,7 +47,7 @@ A modern, full-stack web application designed to streamline order management for
 - **File Upload**: Multer
 - **Deployment**: Render
 
-## 📦 Installation
+## Installation
 
 ### Prerequisites
 - Node.js (v18 or higher)
@@ -104,7 +104,7 @@ npm run dev
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8000
 
-## 🚀 Usage
+## Usage
 
 ### Default Credentials
 
@@ -123,7 +123,7 @@ npm run dev
 2. **Vendor Flow**:
    - Login → View dashboard → Manage menu items → Process orders → Verify payments → Update order status
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 ChaiAdda-System/
@@ -153,7 +153,7 @@ ChaiAdda-System/
 └── README.md
 ```
 
-## 🔑 Key Features Implementation
+## Key Features Implementation
 
 ### Real-time Updates
 - Socket.io integration for live order status updates
@@ -176,7 +176,7 @@ ChaiAdda-System/
 - Vendors verify payments before processing
 - UTR number tracking for transactions
 
-## 🔒 Security Features
+## Security Features
 
 - JWT-based authentication
 - Role-based access control (Student/Admin)
@@ -185,7 +185,7 @@ ChaiAdda-System/
 - CORS configuration
 - Input validation
 
-## 🚢 Deployment
+## Deployment
 
 ### Frontend (Vercel)
 1. Connect your GitHub repository to Vercel
@@ -208,17 +208,17 @@ ChaiAdda-System/
 
 For detailed deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
 
-## 🐛 Known Issues & Solutions
+## Known Issues & Solutions
 
 All major issues have been resolved:
-- ✅ Fixed TypeScript build errors on Render
-- ✅ Fixed "Order not found" error on vendor order page
-- ✅ Fixed "Unknown Item" display in dashboard
-- ✅ Fixed missing UTR number display
-- ✅ Fixed reviews.map runtime error
-- ✅ Implemented pagination for vendor menu
+- Fixed TypeScript build errors on Render
+- Fixed "Order not found" error on vendor order page
+- Fixed "Unknown Item" display in dashboard
+- Fixed missing UTR number display
+- Fixed reviews.map runtime error
+- Implemented pagination for vendor menu
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
@@ -226,21 +226,21 @@ All major issues have been resolved:
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License.
 
-## 👥 Authors
+## Authors
 
 - **Ansh Tomar** - [GitHub](https://github.com/uATrisk)
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Built for college canteen management
 - Inspired by modern food ordering platforms
 - Special thanks to all contributors and testers
 
-## 📞 Support
+## Support
 
 For issues and questions:
 - Open an issue on [GitHub](https://github.com/uATrisk/ChaiAdda-System/issues)
@@ -248,4 +248,4 @@ For issues and questions:
 
 ---
 
-**Made with ❤️ for Chai Adda**
+**Made with care for Chai Adda**

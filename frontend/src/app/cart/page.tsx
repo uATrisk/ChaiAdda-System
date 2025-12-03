@@ -2,7 +2,7 @@
 
 import { useCart } from "@/context/CartContext";
 import Link from "next/link";
-import { Coffee } from "lucide-react";
+import { Coffee, ShoppingCart } from "lucide-react";
 
 export default function CartPage() {
   const { cart, increaseQty, decreaseQty, removeFromCart, clearCart, total } = useCart();
@@ -30,8 +30,8 @@ export default function CartPage() {
 
       {cart.length === 0 ? (
         <div className="text-center py-20 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col items-center justify-center min-h-[400px]">
-          <div className="w-24 h-24 bg-brand-yellow/20 rounded-full flex items-center justify-center text-4xl mb-6">
-            🛒
+          <div className="w-24 h-24 bg-brand-yellow/20 rounded-full flex items-center justify-center mb-6">
+            <ShoppingCart size={48} className="text-brand-orange" />
           </div>
           <h2 className="text-3xl font-black text-brand-dark mb-2">Your cart is empty</h2>
           <p className="text-gray-400 mb-8 text-lg">Looks like you haven't added anything yet.</p>

@@ -4,7 +4,7 @@ import { useEffect, useState, use } from "react";
 import { API_URL, apiGet } from "@/lib/api";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Coffee } from "lucide-react";
+import { Coffee, Camera, Check, X } from "lucide-react";
 
 type OrderItem = {
   id: string;
@@ -182,7 +182,7 @@ export default function VendorOrderPage({
               </a>
             ) : (
               <div className="w-full h-48 bg-gray-50 rounded-2xl flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-200">
-                <span className="text-4xl mb-2">📷</span>
+                <Camera size={48} className="mb-2" />
                 <span className="font-medium">No screenshot uploaded</span>
               </div>
             )}
@@ -200,13 +200,13 @@ export default function VendorOrderPage({
                   onClick={() => updatePayment("VERIFIED")}
                   className="py-4 bg-green-500 text-white font-bold rounded-2xl hover:bg-green-600 transition-all shadow-lg hover:shadow-green-200 transform active:scale-[0.99]"
                 >
-                  ✓ Verify Payment
+                  <Check size={20} className="inline mr-2" />Verify Payment
                 </button>
                 <button
                   onClick={() => updatePayment("FAILED")}
                   className="py-4 bg-red-500 text-white font-bold rounded-2xl hover:bg-red-600 transition-all shadow-lg hover:shadow-red-200 transform active:scale-[0.99]"
                 >
-                  ✕ Reject Payment
+                  <X size={20} className="inline mr-2" />Reject Payment
                 </button>
               </div>
             </div>
