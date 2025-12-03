@@ -8,7 +8,7 @@ import Link from "next/link";
 import { ArrowLeft, CreditCard, Wallet, Banknote, Coffee } from "lucide-react";
 
 export default function CheckoutPage() {
-  const { cart, total } = useCart();
+  const { cart, total, clearCart } = useCart();
   const router = useRouter();
 
   const [utr, setUtr] = useState("");
@@ -77,6 +77,7 @@ export default function CheckoutPage() {
         });
       }
 
+      clearCart();
       router.push(`/order/${orderId}`);
     } catch (err) {
       console.error("Network error during checkout:", err);
