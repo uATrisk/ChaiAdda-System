@@ -34,7 +34,7 @@ export default function Navbar() {
                     <div className="w-8 h-8 bg-brand-orange rounded-full flex items-center justify-center text-white font-black text-lg">
                         C
                     </div>
-                    <span className="font-black text-xl tracking-tight">CHAI ADDA</span>
+                    <span className="font-black text-xl tracking-tight hidden md:block">CHAI ADDA</span>
                 </Link>
 
                 {/* Desktop Navigation */}

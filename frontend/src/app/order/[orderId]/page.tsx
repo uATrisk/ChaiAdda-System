@@ -1,24 +1,57 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import { socket } from "@/lib/socket";
-import { API_URL } from "@/lib/api";
+import { API_URL, apiGet } from "@/lib/api";
 import Link from "next/link";
-import { Receipt, Camera } from "lucide-react";
+import { Receipt, Camera, Coffee } from "lucide-react";
 
 interface OrderPageProps {
-  params: {
+  params: Promise<{
     orderId: string;
-  };
+  }>;
 }
 
+type OrderItem = {
+  id: string;
+  qty: number;
+  price: number;
+  item: {
+    name: string;
+  };
+};
+
+type Order = {
+  id: string;
+  paymentStatus: "PENDING" | "VERIFIED" | "FAILED";
+  orderStatus: "RECEIVED" | "PREPARING" | "READY" | "COMPLETED";
+  items: OrderItem[];
+};
+
 export default function OrderStatusPage({ params }: OrderPageProps) {
-  const { orderId } = params;
+  const { orderId } = use(params);
 
   const [status, setStatus] = useState<string>("RECEIVED");
   const [paymentStatus, setPaymentStatus] = useState<string>("PENDING");
+  const [order, setOrder] = useState<Order | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Fetch order data
+    apiGet(`/orders/${orderId}`)
+      .then((data) => {
+        console.log("Order API response:", data);
+        if (data.order) {
+          console.log("Order data:", data.order);
+          console.log("Order items:", data.order.items);
+          setOrder(data.order);
+          setStatus(data.order.orderStatus);
+          setPaymentStatus(data.order.paymentStatus);
+        }
+      })
+      .catch((err) => console.error("Failed to load order:", err))
+      .finally(() => setLoading(false));
+
     socket.emit("join-order", orderId);
 
     const handleUpdate = (data: {
@@ -58,6 +91,19 @@ export default function OrderStatusPage({ params }: OrderPageProps) {
     }
   };
 
+  const calculateTotal = () => {
+    if (!order) return 0;
+    return order.items.reduce((sum, item) => sum + item.price, 0);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-brand-bg flex items-center justify-center">
+        <p className="text-xl font-bold text-gray-400 animate-pulse">Loading Order Details...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-brand-bg font-sans p-4 md:p-8 flex flex-col items-center justify-center">
       <Link href="/menu" className="absolute top-8 left-8 text-brand-dark font-bold hover:text-brand-orange transition-colors flex items-center gap-2">
@@ -77,6 +123,34 @@ export default function OrderStatusPage({ params }: OrderPageProps) {
         </div>
 
         <div className="space-y-6">
+          {/* Order Items Section */}
+          {order && order.items.length > 0 && (
+            <div className="bg-gray-50 rounded-2xl p-6">
+              <h2 className="text-lg font-black text-brand-dark mb-4 border-b border-gray-200 pb-2">Your Order</h2>
+              <div className="space-y-3">
+                {order.items.map((item) => (
+                  <div key={item.id} className="flex justify-between items-center bg-white p-3 rounded-xl">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-brand-yellow rounded-full flex items-center justify-center">
+                        <Coffee size={20} className="text-brand-dark" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-brand-dark text-sm">{item.item.name}</p>
+                        <p className="text-xs text-gray-400">Qty: {item.qty}</p>
+                      </div>
+                    </div>
+                    <span className="font-bold text-brand-dark">₹{item.price}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Total */}
+              <div className="mt-4 pt-4 border-t border-gray-200 flex justify-between items-center">
+                <span className="font-black text-brand-dark text-lg">Total</span>
+                <span className="font-black text-brand-orange text-xl">₹{calculateTotal()}</span>
+              </div>
+            </div>
+          )}
           {/* Status Section */}
           <div className="bg-gray-50 rounded-2xl p-6 text-center">
             <p className="text-gray-500 font-bold text-sm mb-2 uppercase tracking-wider">Order Status</p>

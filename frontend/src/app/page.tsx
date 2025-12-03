@@ -2,28 +2,41 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useCart } from "@/context/CartContext";
 import Navbar from "@/components/Navbar";
-import { Coffee, ArrowRight, Star, Clock, ShieldCheck, Sandwich, Pizza, UtensilsCrossed, X } from "lucide-react";
+import { Coffee, ArrowRight, Star, Clock, ShieldCheck, Sandwich, Pizza, UtensilsCrossed, X, ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function Home() {
   const { cart } = useCart();
   const [activeDeal, setActiveDeal] = useState<'COMBO' | 'STUDENT' | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const { current } = scrollRef;
+      const scrollAmount = 300;
+      if (direction === 'left') {
+        current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+      } else {
+        current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      }
+    }
+  };
 
   return (
     <main className="min-h-screen p-4 md:p-8 max-w-7xl mx-auto space-y-12">
       <Navbar />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 bg-brand-yellow rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden min-h-[500px] flex flex-col justify-center group">
+        <div className="md:col-span-2 bg-gradient-to-br from-[#FFF8E7] to-[#E6D5B8] rounded-[2.5rem] p-6 md:p-12 relative overflow-hidden min-h-[300px] md:min-h-[500px] flex flex-col justify-center group shadow-sm">
           <div className="relative z-10 max-w-lg transition-transform duration-500 group-hover:scale-105">
             <div className="flex gap-2 mb-4">
-              <span className="bg-white/30 backdrop-blur-sm px-4 py-1 rounded-full text-sm font-bold text-brand-dark flex items-center gap-2">
+              <span className="bg-brand-dark/5 backdrop-blur-sm px-4 py-1 rounded-full text-sm font-bold text-brand-dark flex items-center gap-2">
                 <Star size={14} fill="currentColor" /> Since 2024
               </span>
             </div>
-            <h1 className="text-6xl md:text-8xl font-black text-white leading-[0.9] mb-6 drop-shadow-sm">
+            <h1 className="text-5xl md:text-8xl font-black text-brand-dark leading-[0.9] mb-6 drop-shadow-sm">
               CHAI<br />ADDA
             </h1>
             <div className="bg-brand-dark text-white inline-block px-6 py-3 rounded-full text-xl font-bold transform -rotate-2 shadow-lg">
@@ -31,18 +44,20 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="absolute top-10 right-10 text-white/20 animate-spin-slow">
+          <div className="absolute top-10 right-10 text-brand-dark/5 animate-spin-slow">
             <svg width="100" height="100" viewBox="0 0 100 100" fill="currentColor">
               <path d="M50 0 L60 40 L100 50 L60 60 L50 100 L40 60 L0 50 L40 40 Z" />
             </svg>
           </div>
 
-          <div className="absolute -right-10 -bottom-10 md:-right-20 md:-bottom-20 w-[120%] h-[120%] md:w-[800px] md:h-[800px] pointer-events-none">
-            <img
-              src="/hero-chai.png"
-              alt="Chai and Bun Maska"
-              className="w-full h-full object-contain drop-shadow-2xl animate-float"
-            />
+          <div className="hidden md:block absolute right-0 bottom-0 w-[400px] h-[400px] lg:w-[500px] lg:h-[500px] pointer-events-none translate-x-1/4 translate-y-1/4">
+            <div className="w-full h-full rounded-full overflow-hidden border-8 border-white/20 shadow-2xl">
+              <img
+                src="/images/masala-chai.png"
+                alt="Chai Cup"
+                className="w-full h-full object-cover animate-float"
+              />
+            </div>
           </div>
         </div>
 
@@ -116,39 +131,50 @@ export default function Home() {
 
       <div className="mb-12">
         <div className="flex items-center justify-between mb-8 px-4">
-          <h2 className="text-3xl font-black text-brand-dark flex items-center gap-3">
-            <span className="w-3 h-8 bg-brand-orange rounded-full"></span>
-            Trending Favorites
+          <h2 className="text-2xl md:text-3xl font-black text-brand-dark">
+            Order our best food options
           </h2>
-          <Link href="/menu" className="group flex items-center gap-2 text-brand-dark font-bold hover:text-brand-orange transition-colors">
-            View All <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-          </Link>
+          <div className="flex gap-2">
+            <button
+              onClick={() => scroll('left')}
+              className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors disabled:opacity-50"
+            >
+              <ChevronLeft size={20} className="text-gray-600" />
+            </button>
+            <button
+              onClick={() => scroll('right')}
+              className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors disabled:opacity-50"
+            >
+              <ChevronRight size={20} className="text-gray-600" />
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div
+          ref={scrollRef}
+          className="flex gap-8 overflow-x-auto pb-8 px-4 scrollbar-hide scroll-smooth"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
           {[
-            { name: "Masala Chai", desc: "Spiced tea", price: "₹20", color: "bg-brand-orange", icon: <Coffee size={40} /> },
-            { name: "Bun Maska", desc: "Fresh bun", price: "₹30", color: "bg-brand-yellow", icon: <Sandwich size={40} /> },
-            { name: "Samosa", desc: "Crispy pastry", price: "₹15", color: "bg-brand-blue", icon: <Pizza size={40} /> },
-            { name: "Iced Tea", desc: "Lemon chilled", price: "₹40", color: "bg-brand-dark", icon: <UtensilsCrossed size={40} /> },
-            { name: "Maggi", desc: "Masala noodles", price: "₹35", color: "bg-red-400", icon: <UtensilsCrossed size={40} /> },
+            { name: "Pizza", img: "/images/food/pizza.png" },
+            { name: "Momo", img: "/images/food/momo.png" },
+            { name: "Dosa", img: "/images/food/dosa.png" },
+            { name: "Burger", img: "/images/food/burger.png" },
+            { name: "Cake", img: "/images/food/cake.png" },
+            { name: "Ice Cream", img: "/images/food/ice-cream.png" },
+            { name: "Salad", img: "/images/food/salad.png" },
           ].map((item, i) => (
-            <div key={i} className="group relative bg-white rounded-[2rem] p-6 hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col items-center text-center overflow-hidden">
-              <div className={`absolute top-0 left-0 w-full h-32 ${item.color} opacity-10 group-hover:opacity-20 transition-opacity rounded-t-[2rem]`}></div>
-
-              <div className={`w-20 h-20 ${item.color} rounded-full flex items-center justify-center text-white mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300 relative z-10`}>
-                {item.icon}
+            <div key={i} className="flex flex-col items-center gap-3 min-w-[120px] cursor-pointer group">
+              <div className="w-32 h-32 md:w-40 md:h-40 relative rounded-full overflow-hidden shadow-md group-hover:shadow-xl transition-all duration-300">
+                <img
+                  src={item.img}
+                  alt={item.name}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
               </div>
-
-              <h3 className="font-black text-xl text-brand-dark mb-1 relative z-10">{item.name}</h3>
-              <p className="text-gray-400 text-sm font-medium mb-4 relative z-10">{item.desc}</p>
-
-              <div className="mt-auto flex items-center justify-between w-full relative z-10 bg-gray-50 rounded-xl p-2">
-                <span className="font-black text-lg text-brand-dark px-2">{item.price}</span>
-                <button className="w-10 h-10 bg-white text-brand-dark rounded-lg flex items-center justify-center shadow-sm hover:bg-brand-dark hover:text-white transition-colors">
-                  +
-                </button>
-              </div>
+              <span className="font-bold text-brand-dark text-lg group-hover:text-brand-orange transition-colors">
+                {item.name}
+              </span>
             </div>
           ))}
         </div>
