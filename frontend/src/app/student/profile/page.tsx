@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiGet, apiPut, apiDelete } from "@/lib/api";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, User, Edit2, Trash2, Star, Package, Clock, CheckCircle } from "lucide-react";
+import { ArrowLeft, User, Edit2, Trash2, Star } from "lucide-react";
 import Link from "next/link";
 
 interface Review {
@@ -15,29 +15,13 @@ interface Review {
     createdAt: string;
 }
 
-interface OrderItem {
-    id: string;
-    qty: number;
-    price: number;
-    item: { name: string };
-}
-
-interface Order {
-    id: string;
-    amount: number;
-    paymentStatus: string;
-    orderStatus: string;
-    createdAt: string;
-    items: OrderItem[];
-}
-
 export default function ProfilePage() {
     const router = useRouter();
     const [user, setUser] = useState<{ id: string; name: string; email: string; role: string } | null>(null);
     const [reviews, setReviews] = useState<Review[]>([]);
-    const [orders, setOrders] = useState<Order[]>([]);
     const [isEditing, setIsEditing] = useState(false);
     const [newName, setNewName] = useState("");
+    const [orders, setOrders] = useState<any[]>([]);
 
     useEffect(() => {
         const userStr = localStorage.getItem("user");
@@ -49,14 +33,11 @@ export default function ProfilePage() {
         setUser(userData);
         setNewName(userData.name);
 
-
-
         apiGet("/reviews/user/me")
             .then((data) => {
                 if (Array.isArray(data)) {
                     setReviews(data);
                 } else {
-                    console.error("Reviews data is not an array:", data);
                     setReviews([]);
                 }
             })
@@ -70,7 +51,6 @@ export default function ProfilePage() {
                 if (Array.isArray(data)) {
                     setOrders(data);
                 } else {
-                    console.error("Orders data is not an array:", data);
                     setOrders([]);
                 }
             })
@@ -79,6 +59,9 @@ export default function ProfilePage() {
                 setOrders([]);
             });
     }, []);
+
+    const activeOrders = orders.filter(o => ["RECEIVED", "IN_PROGRESS", "READY"].includes(o.orderStatus));
+    const completedOrders = orders.filter(o => ["DELIVERED", "CANCELLED"].includes(o.orderStatus));
 
     const handleUpdateProfile = async () => {
         try {
@@ -113,7 +96,7 @@ export default function ProfilePage() {
     };
 
     const handleDeleteAccount = async () => {
-        if (!confirm("Are you sure you want to delete your account? This action cannot be undone and will delete all your orders and reviews.")) {
+        if (!confirm("⚠️ Are you sure you want to delete your account? This action cannot be undone and will delete all your orders and reviews.")) {
             return;
         }
 
@@ -187,6 +170,52 @@ export default function ProfilePage() {
                 </div>
             </div>
 
+            {/* Active Orders Section */}
+            <h2 className="text-xl font-black text-brand-dark mb-4 px-2">ACTIVE ORDERS</h2>
+            <div className="space-y-4 mb-8">
+                {activeOrders.length === 0 ? (
+                    <p className="text-gray-500 text-center py-8 bg-white rounded-[2rem]">No active orders.</p>
+                ) : (
+                    activeOrders.map((order) => (
+                        <div key={order.id} className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex justify-between items-center">
+                            <div>
+                                <p className="font-bold text-brand-dark mb-1">Order #{order.id.slice(0, 8)}</p>
+                                <p className="text-sm text-gray-500">{new Date(order.createdAt).toLocaleDateString()} • ₹{order.amount}</p>
+                                <div className="flex gap-2 mt-2">
+                                    <span className="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-lg">{order.orderStatus}</span>
+                                    <span className={`text-xs font-bold px-2 py-1 rounded-lg ${order.paymentStatus === 'VERIFIED' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
+                                        {order.paymentStatus}
+                                    </span>
+                                </div>
+                            </div>
+                            <Link href={`/order/${order.id}`} className="bg-brand-dark text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-brand-orange transition-colors">
+                                Track
+                            </Link>
+                        </div>
+                    ))
+                )}
+            </div>
+
+            {/* Completed Orders Section */}
+            <h2 className="text-xl font-black text-brand-dark mb-4 px-2">COMPLETED ORDERS</h2>
+            <div className="space-y-4 mb-8">
+                {completedOrders.length === 0 ? (
+                    <p className="text-gray-500 text-center py-8 bg-white rounded-[2rem]">No completed orders yet.</p>
+                ) : (
+                    completedOrders.map((order) => (
+                        <div key={order.id} className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 opacity-75">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <p className="font-bold text-brand-dark mb-1">Order #{order.id.slice(0, 8)}</p>
+                                    <p className="text-sm text-gray-500">{new Date(order.createdAt).toLocaleDateString()} • ₹{order.amount}</p>
+                                </div>
+                                <span className="text-xs font-bold bg-gray-100 text-gray-700 px-3 py-1 rounded-lg">{order.orderStatus}</span>
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+
             <div className="bg-white rounded-[2.5rem] p-6 shadow-sm border border-red-100 mb-8">
                 <h3 className="text-lg font-bold text-red-600 mb-2">Danger Zone</h3>
                 <p className="text-gray-600 text-sm mb-4">Once you delete your account, there is no going back. Please be certain.</p>
@@ -198,97 +227,7 @@ export default function ProfilePage() {
                 </button>
             </div>
 
-            <h2 className="text-xl font-black text-brand-dark mb-4 px-2">CURRENT ORDERS</h2>
-            <div className="space-y-4">
-                {orders.filter(o => o.orderStatus !== "DELIVERED").length === 0 ? (
-                    <p className="text-gray-500 text-center py-8 bg-white rounded-[2rem]">No current orders.</p>
-                ) : (
-                    orders.filter(o => o.orderStatus !== "DELIVERED").map((order) => (
-                        <div key={order.id} className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100">
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 bg-brand-orange/10 rounded-full flex items-center justify-center">
-                                        <Package size={24} className="text-brand-orange" />
-                                    </div>
-                                    <div>
-                                        <p className="font-bold text-brand-dark">Order #{order.id.slice(0, 8)}</p>
-                                        <p className="text-sm text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</p>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <p className="font-black text-brand-dark">₹{order.amount}</p>
-                                    <div className="flex gap-2 mt-1">
-                                        <span className={`text-xs px-2 py-1 rounded-full font-bold ${order.paymentStatus === "VERIFIED" ? "bg-green-100 text-green-700" :
-                                                order.paymentStatus === "FAILED" ? "bg-red-100 text-red-700" :
-                                                    "bg-orange-100 text-orange-700"
-                                            }`}>
-                                            {order.paymentStatus}
-                                        </span>
-                                        <span className={`text-xs px-2 py-1 rounded-full font-bold ${order.orderStatus === "READY" ? "bg-green-100 text-green-700" :
-                                                order.orderStatus === "IN_PROGRESS" ? "bg-blue-100 text-blue-700" :
-                                                    "bg-gray-100 text-gray-700"
-                                            }`}>
-                                            {order.orderStatus}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="border-t border-gray-100 pt-3 mt-3">
-                                <p className="text-sm text-gray-600 mb-2">Items:</p>
-                                <div className="space-y-1">
-                                    {order.items.map((item) => (
-                                        <p key={item.id} className="text-sm text-gray-700">
-                                            {item.item.name} x {item.qty}
-                                        </p>
-                                    ))}
-                                </div>
-                            </div>
-                            <Link
-                                href={`/order/${order.id}`}
-                                className="mt-4 block text-center py-2 bg-brand-dark text-white rounded-xl font-bold hover:bg-brand-orange transition-colors"
-                            >
-                                View Details
-                            </Link>
-                        </div>
-                    ))
-                )}
-            </div>
-
-            <h2 className="text-xl font-black text-brand-dark mb-4 px-2 mt-8">COMPLETED ORDERS</h2>
-            <div className="space-y-4">
-                {orders.filter(o => o.orderStatus === "DELIVERED").length === 0 ? (
-                    <p className="text-gray-500 text-center py-8 bg-white rounded-[2rem]">No completed orders yet.</p>
-                ) : (
-                    orders.filter(o => o.orderStatus === "DELIVERED").map((order) => (
-                        <div key={order.id} className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 opacity-75">
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                                        <CheckCircle size={24} className="text-green-600" />
-                                    </div>
-                                    <div>
-                                        <p className="font-bold text-brand-dark">Order #{order.id.slice(0, 8)}</p>
-                                        <p className="text-sm text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</p>
-                                    </div>
-                                </div>
-                                <p className="font-black text-brand-dark">₹{order.amount}</p>
-                            </div>
-                            <div className="border-t border-gray-100 pt-3 mt-3">
-                                <p className="text-sm text-gray-600 mb-2">Items:</p>
-                                <div className="space-y-1">
-                                    {order.items.map((item) => (
-                                        <p key={item.id} className="text-sm text-gray-700">
-                                            {item.item.name} x {item.qty}
-                                        </p>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    ))
-                )}
-            </div>
-
-            <h2 className="text-xl font-black text-brand-dark mb-4 px-2 mt-8">MY REVIEWS</h2>
+            <h2 className="text-xl font-black text-brand-dark mb-4 px-2">MY REVIEWS</h2>
             <div className="space-y-4">
                 {reviews.length === 0 ? (
                     <p className="text-gray-500 text-center py-8 bg-white rounded-[2rem]">You haven't written any reviews yet.</p>
