@@ -1,13 +1,13 @@
-import { io } from "../index.js";
+import { getIo } from "../socket.js";
 
 export const emitOrderUpdate = (orderId: string, data: any) => {
-  io.to(orderId).emit("order-update", data);
+  getIo().to(orderId).emit("order-update", data);
 };
 
 export const emitNewOrder = (order: any) => {
-  io.emit("new-order", order);
+  getIo().emit("new-order", order);
 };
 
 export const emitItemUpdate = (item: any) => {
-  io.emit("item-updated", item);
+  getIo().emit("item-updated", item);
 };

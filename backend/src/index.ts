@@ -2,7 +2,8 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import http from "http";
-import { Server } from "socket.io";
+import { initSocket } from "./socket.js";
+
 import { prisma } from "./prisma.js";
 
 dotenv.config();
@@ -20,29 +21,7 @@ app.use(express.json());
 
 const server = http.createServer(app);
 
-export const io = new Server(server, {
-  cors: {
-    origin: [
-      "http://localhost:3000",
-      process.env.FRONTEND_URL || "https://your-project.vercel.app",
-      /\.vercel\.app$/
-    ],
-    credentials: true
-  },
-});
-
-io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
-
-  socket.on("join-order", (orderId) => {
-    socket.join(orderId);
-    console.log(`User joined order room: ${orderId}`);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
-  });
-});
+export const io = initSocket(server);
 
 import authRoutes from "./routes/auth.routes.js";
 import itemRoutes from "./routes/item.routes.js";
