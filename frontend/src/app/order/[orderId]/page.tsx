@@ -4,7 +4,7 @@ import { useEffect, useState, use } from "react";
 import { socket } from "@/lib/socket";
 import { API_URL, apiGet } from "@/lib/api";
 import Link from "next/link";
-import { Receipt, Camera, Coffee } from "lucide-react";
+import { Receipt, Camera, Coffee, ArrowLeft } from "lucide-react";
 
 interface OrderPageProps {
   params: Promise<{
@@ -40,10 +40,7 @@ export default function OrderStatusPage({ params }: OrderPageProps) {
     // Fetch order data
     apiGet(`/orders/${orderId}`)
       .then((data) => {
-        console.log("Order API response:", data);
         if (data.order) {
-          console.log("Order data:", data.order);
-          console.log("Order items:", data.order.items);
           setOrder(data.order);
           setStatus(data.order.orderStatus);
           setPaymentStatus(data.order.paymentStatus);
@@ -81,16 +78,6 @@ export default function OrderStatusPage({ params }: OrderPageProps) {
     };
   }, [orderId]);
 
-  const getStatusColor = (s: string) => {
-    switch (s) {
-      case "RECEIVED": return "bg-blue-100 text-blue-800";
-      case "PREPARING": return "bg-yellow-100 text-yellow-800";
-      case "READY": return "bg-green-100 text-green-800";
-      case "COMPLETED": return "bg-gray-100 text-gray-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  };
-
   const calculateTotal = () => {
     if (!order) return 0;
     return order.items.reduce((sum, item) => sum + item.price, 0);
@@ -99,127 +86,149 @@ export default function OrderStatusPage({ params }: OrderPageProps) {
   if (loading) {
     return (
       <div className="min-h-screen bg-brand-bg flex items-center justify-center">
-        <p className="text-xl font-bold text-gray-400 animate-pulse">Loading Order Details...</p>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-orange"></div>
       </div>
     );
   }
 
+  // Helper for timeline steps
+  const steps = ["RECEIVED", "PREPARING", "READY", "COMPLETED"];
+  const currentStepIndex = steps.indexOf(status);
+
   return (
-    <div className="min-h-screen bg-brand-bg font-sans p-4 md:p-8 flex flex-col items-center justify-center">
-      <Link href="/menu" className="absolute top-8 left-8 text-brand-dark font-bold hover:text-brand-orange transition-colors flex items-center gap-2">
-        <span>←</span> Back to Menu
+    <div className="min-h-screen bg-brand-bg font-sans p-4 md:p-8 flex items-start justify-center pt-20">
+      <Link href="/menu" className="fixed top-6 left-6 z-50 bg-white/80 backdrop-blur-md p-3 rounded-full text-brand-dark font-bold hover:text-brand-orange transition-all shadow-sm hover:shadow-md">
+        <ArrowLeft size={24} />
       </Link>
 
-      <div className="bg-white rounded-[2rem] shadow-xl p-8 max-w-md w-full border border-gray-100 relative overflow-hidden">
-        {/* Receipt Top Decoration */}
-        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-brand-yellow via-brand-orange to-brand-blue"></div>
-
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-brand-dark text-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <Receipt size={32} />
+      <div className="relative w-full max-w-md">
+        {/* Receipt Container */}
+        <div className="bg-white relative shadow-2xl overflow-hidden print:shadow-none animate-slide-up" style={{ borderRadius: '20px 20px 0 0' }}>
+          {/* Top Pattern */}
+          <div className="h-3 bg-brand-dark opacity-10"
+            style={{ backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, #000 10px, #000 20px)' }}>
           </div>
-          <h1 className="text-2xl font-black text-brand-dark mb-1">Order Receipt</h1>
-          <p className="text-gray-400 text-sm font-mono">{orderId}</p>
-        </div>
 
-        <div className="space-y-6">
-          {/* Order Items Section */}
-          {order && order.items.length > 0 && (
-            <div className="bg-gray-50 rounded-2xl p-6">
-              <h2 className="text-lg font-black text-brand-dark mb-4 border-b border-gray-200 pb-2">Your Order</h2>
-              <div className="space-y-3">
-                {order.items.map((item) => (
-                  <div key={item.id} className="flex justify-between items-center bg-white p-3 rounded-xl">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-brand-yellow rounded-full flex items-center justify-center">
-                        <Coffee size={20} className="text-brand-dark" />
-                      </div>
-                      <div>
-                        <p className="font-bold text-brand-dark text-sm">{item.item.name}</p>
-                        <p className="text-xs text-gray-400">Qty: {item.qty}</p>
-                      </div>
+          <div className="p-8 pb-12">
+            <div className="text-center mb-8 border-b-2 border-dashed border-gray-200 pb-8">
+              <h1 className="text-4xl font-black text-brand-dark tracking-tighter mb-2">CHAI ADDA</h1>
+              <p className="text-xs font-mono text-gray-400 uppercase tracking-[0.2em] mb-4">Official Receipt</p>
+              <div className="inline-flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-lg border border-gray-100">
+                <span className="text-xs text-gray-500 font-bold">ORDER ID:</span>
+                <span className="font-mono font-black text-brand-dark tracking-widest">#{orderId.slice(-6).toUpperCase()}</span>
+              </div>
+            </div>
+
+            {/* Status Timeline */}
+            <div className="mb-10">
+              <div className="flex justify-between relative z-10">
+                {steps.map((step, idx) => (
+                  <div key={step} className="flex flex-col items-center">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-500 ${idx <= currentStepIndex ? "bg-brand-orange border-brand-orange text-white scale-110" : "bg-white border-gray-200 text-gray-300"
+                      }`}>
+                      {idx <= currentStepIndex && <Receipt size={14} />}
                     </div>
-                    <span className="font-bold text-brand-dark">₹{item.price}</span>
+                    <span className={`text-[10px] font-bold mt-2 uppercase tracking-wide ${idx <= currentStepIndex ? "text-brand-dark" : "text-gray-300"
+                      }`}>{step}</span>
                   </div>
                 ))}
               </div>
-
-              {/* Total */}
-              <div className="mt-4 pt-4 border-t border-gray-200 flex justify-between items-center">
-                <span className="font-black text-brand-dark text-lg">Total</span>
-                <span className="font-black text-brand-orange text-xl">₹{calculateTotal()}</span>
+              {/* Connecting Line */}
+              <div className="absolute top-[178px] left-12 right-12 h-0.5 bg-gray-100 -z-0">
+                <div className="h-full bg-brand-orange transition-all duration-1000 ease-out" style={{ width: `${(currentStepIndex / (steps.length - 1)) * 100}%` }}></div>
               </div>
             </div>
-          )}
-          {/* Status Section */}
-          <div className="bg-gray-50 rounded-2xl p-6 text-center">
-            <p className="text-gray-500 font-bold text-sm mb-2 uppercase tracking-wider">Order Status</p>
-            <span className={`px-4 py-2 rounded-full font-black text-lg ${getStatusColor(status)}`}>
-              {status}
-            </span>
-            <p className="text-xs text-gray-400 mt-4 animate-pulse">
-              Live updates enabled...
-            </p>
-          </div>
 
-          {/* Payment Status */}
-          <div className="flex justify-between items-center border-b border-gray-100 pb-4">
-            <span className="font-bold text-gray-600">Payment Status</span>
-            <span className={`font-black ${paymentStatus === "VERIFIED" ? "text-green-500" :
-              paymentStatus === "FAILED" ? "text-red-500" : "text-brand-orange"
-              }`}>
-              {paymentStatus}
-            </span>
-          </div>
-
-          {/* Upload Proof (if pending) */}
-          {paymentStatus === "PENDING" && (
-            <div className="bg-brand-blue/10 rounded-2xl p-6 border border-brand-blue/20">
-              <h2 className="font-bold text-brand-dark mb-2 flex items-center gap-2">
-                <Camera size={20} className="inline mr-2" />Upload Payment Proof
-              </h2>
-              <p className="text-sm text-gray-600 mb-4">
-                Forgot to upload screenshot? Do it here.
-              </p>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={async (e) => {
-                  if (!e.target.files?.[0]) return;
-                  const file = e.target.files[0];
-                  const formData = new FormData();
-                  formData.append("proof", file);
-
-                  try {
-                    const token = localStorage.getItem("token");
-                    const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
-
-                    const res = await fetch(`${API_URL}/orders/${orderId}/upload-proof`, {
-                      method: "POST",
-                      headers: headers,
-                      body: formData,
-                    });
-                    if (res.ok) {
-                      alert("Proof uploaded successfully!");
-                    } else {
-                      alert("Upload failed.");
-                    }
-                  } catch (err) {
-                    console.error(err);
-                    alert("Error uploading proof.");
-                  }
-                }}
-                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-blue file:text-white hover:file:bg-brand-dark transition-all"
-              />
+            <div className="space-y-4 mb-8">
+              {order && order.items.map((item) => (
+                <div key={item.id} className="flex justify-between items-start text-sm">
+                  <div className="flex gap-3">
+                    <span className="font-bold text-brand-orange font-mono">x{item.qty}</span>
+                    <span className="font-bold text-gray-700 uppercase">{item.item.name}</span>
+                  </div>
+                  <span className="font-mono font-bold text-gray-900">₹{item.price.toFixed(2)}</span>
+                </div>
+              ))}
             </div>
-          )}
+
+            <div className="border-t-2 border-brand-dark pt-4 flex justify-between items-end mb-8">
+              <span className="text-sm font-bold text-gray-500 uppercase">Total Amount</span>
+              <span className="text-3xl font-black text-brand-dark">₹{calculateTotal().toFixed(2)}</span>
+            </div>
+
+            {/* Payment Status Badge */}
+            <div className={`p-4 rounded-xl border-2 text-center mb-6 ${paymentStatus === "VERIFIED" ? "bg-green-50 border-green-500 text-green-700" :
+              paymentStatus === "FAILED" ? "bg-red-50 border-red-500 text-red-700" :
+                "bg-yellow-50 border-yellow-500 text-yellow-700"
+              }`}>
+              <p className="text-xs font-black uppercase tracking-widest mb-1">Payment Status</p>
+              <p className="text-xl font-black">{paymentStatus}</p>
+            </div>
+
+            {/* Upload Proof (if pending) */}
+            {paymentStatus === "PENDING" && (
+              <div className="text-center">
+                <label className="inline-flex flex-col items-center gap-2 cursor-pointer group">
+                  <div className="w-16 h-16 bg-brand-dark text-white rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <Camera size={28} />
+                  </div>
+                  <span className="text-sm font-bold text-brand-dark underline decoration-brand-orange decoration-2">Upload Payment Proof</span>
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={async (e) => {
+                      if (!e.target.files?.[0]) return;
+                      const file = e.target.files[0];
+                      const formData = new FormData();
+                      formData.append("proof", file);
+
+                      try {
+                        const token = localStorage.getItem("token");
+                        const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+
+                        const res = await fetch(`${API_URL}/orders/${orderId}/upload-proof`, {
+                          method: "POST",
+                          headers: headers,
+                          body: formData,
+                        });
+                        if (res.ok) {
+                          alert("Proof uploaded successfully!");
+                        } else {
+                          alert("Upload failed.");
+                        }
+                      } catch (err) {
+                        console.error(err);
+                        alert("Error uploading proof.");
+                      }
+                    }}
+                  />
+                </label>
+              </div>
+            )}
+          </div>
+
+          {/* Receipt Bottom Tear Effect */}
+          <div className="relative h-4 bg-white" style={{
+            maskImage: 'radial-gradient(circle at 10px 0, transparent 0, transparent 10px, black 11px)',
+            maskSize: '20px 100%',
+            maskPosition: '0 0',
+            WebkitMaskImage: 'radial-gradient(circle at 10px 0, transparent 0, transparent 10px, black 11px)',
+            WebkitMaskSize: '20px 20px',
+            WebkitMaskRepeat: 'repeat-x'
+          }}></div>
+          {/* Bottom jagged edge simulation using css clip-path is tricky, purely svg/mask is better or just multiple divs */}
+          {/* Creating a jagged border using css gradient */}
+          <div className="h-6 w-full bg-white" style={{
+            background: 'linear-gradient(45deg, transparent 33.333%, #ffffff 33.333%, #ffffff 66.667%, transparent 66.667%), linear-gradient(-45deg, transparent 33.333%, #ffffff 33.333%, #ffffff 66.667%, transparent 66.667%)',
+            backgroundSize: '20px 40px',
+            backgroundPosition: '0 -20px'
+          }}></div>
         </div>
 
-        <div className="mt-8 text-center">
-          <p className="text-gray-400 text-xs">
-            Thank you for ordering with Chai Adda!
-          </p>
-        </div>
+        <p className="text-center text-gray-400 text-xs mt-8 font-mono">
+          Generated at {new Date().toLocaleTimeString()}
+        </p>
       </div>
     </div>
   );

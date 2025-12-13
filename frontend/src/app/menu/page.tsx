@@ -21,7 +21,7 @@ interface Item {
 
 export default function MenuPage() {
   const [items, setItems] = useState<Item[]>([]);
-  const { addToCart, cart } = useCart();
+  const { addToCart, cart, removeFromCart, increaseQty, decreaseQty } = useCart();
   const router = useRouter();
   const [activeCategory, setActiveCategory] = useState("All");
 
@@ -43,7 +43,7 @@ export default function MenuPage() {
 
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
-  const handleAddToCart = (item: Item) => {
+  const handleAddToCart = (item: Item, delta: number = 1) => {
     const token = localStorage.getItem("token");
     if (!token) {
       alert("Please login to order items!");
@@ -51,15 +51,28 @@ export default function MenuPage() {
       return;
     }
 
-    addToCart({
-      itemId: item.id,
-      name: item.name,
-      price: item.price,
-      qty: 1,
-    });
+    const cartItem = cart.find((c) => c.itemId === item.id);
 
-    setShowSuccessPopup(true);
-    setTimeout(() => setShowSuccessPopup(false), 2000);
+    if (delta > 0) {
+      if (cartItem) {
+        increaseQty(item.id);
+      } else {
+        addToCart({
+          itemId: item.id,
+          name: item.name,
+          price: item.price,
+          qty: 1,
+        });
+        setShowSuccessPopup(true);
+        setTimeout(() => setShowSuccessPopup(false), 2000);
+      }
+    } else {
+      if (cartItem && cartItem.qty === 1) {
+        removeFromCart(item.id);
+      } else {
+        decreaseQty(item.id);
+      }
+    }
   };
 
   interface Review {
@@ -189,83 +202,111 @@ export default function MenuPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredItems.map((item, i) => (
-            <div
-              key={item.id}
-              className={`bg-white rounded-[2rem] p-4 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 group flex flex-col justify-between h-full ${!item.available ? "opacity-75 grayscale" : ""
-                }`}
-            >
-              <div>
-                <div className="relative h-48 w-full mb-4 rounded-2xl overflow-hidden bg-gray-100">
-                  {item.image ? (
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-300">
-                      {i % 4 === 0 ? <Coffee size={48} /> : i % 4 === 1 ? <Sandwich size={48} /> : i % 4 === 2 ? <Pizza size={48} /> : <UtensilsCrossed size={48} />}
-                    </div>
-                  )}
-                  {!item.available && (
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                      <span className="bg-white text-brand-dark px-4 py-1 rounded-full font-bold text-sm">SOLD OUT</span>
-                    </div>
-                  )}
-                </div>
+          {filteredItems.map((item, i) => {
+            const cartItem = cart.find((c) => c.itemId === item.id);
+            const qty = cartItem ? cartItem.qty : 0;
 
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h2 className="text-xl font-bold text-brand-dark leading-tight group-hover:text-brand-orange transition-colors">
-                      {item.name}
-                    </h2>
-                    {item.rating !== undefined && item.rating > 0 && (
-                      <div className="flex items-center gap-1 mt-1">
-                        <Star size={14} className="text-yellow-400 fill-current" />
-                        <span className="text-gray-600 text-sm font-bold">{item.rating.toFixed(1)}</span>
-                        <span className="text-gray-400 text-xs">({item.reviews?.length || 0})</span>
+            return (
+              <div
+                key={item.id}
+                className={`bg-white rounded-[2rem] p-4 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 group flex flex-col justify-between h-full ${!item.available ? "opacity-75 grayscale" : ""
+                  }`}
+              >
+                <div>
+                  <div className="relative h-48 w-full mb-4 rounded-2xl overflow-hidden bg-gray-100">
+                    {item.image ? (
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-300">
+                        {i % 4 === 0 ? <Coffee size={48} /> : i % 4 === 1 ? <Sandwich size={48} /> : i % 4 === 2 ? <Pizza size={48} /> : <UtensilsCrossed size={48} />}
+                      </div>
+                    )}
+                    {!item.available && (
+                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                        <span className="bg-white text-brand-dark px-4 py-1 rounded-full font-bold text-sm">SOLD OUT</span>
                       </div>
                     )}
                   </div>
-                  <span className="font-black text-lg text-brand-dark whitespace-nowrap ml-2">₹{item.price}</span>
+
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <h2 className="text-xl font-bold text-brand-dark leading-tight group-hover:text-brand-orange transition-colors">
+                        {item.name}
+                      </h2>
+                      {item.rating !== undefined && item.rating > 0 && (
+                        <div className="flex items-center gap-1 mt-1">
+                          <Star size={14} className="text-yellow-400 fill-current" />
+                          <span className="text-gray-600 text-sm font-bold">{item.rating.toFixed(1)}</span>
+                          <span className="text-gray-400 text-xs">({item.reviews?.length || 0})</span>
+                        </div>
+                      )}
+                    </div>
+                    <span className="font-black text-lg text-brand-dark whitespace-nowrap ml-2">₹{item.price}</span>
+                  </div>
+
+                  <p className="text-gray-400 text-xs mb-4 uppercase tracking-wider font-bold">
+                    {item.category}
+                  </p>
                 </div>
 
-                <p className="text-gray-400 text-xs mb-4 uppercase tracking-wider font-bold">
-                  {item.category}
-                </p>
-
-                <button
-                  onClick={() => handleOpenReviews(item)}
-                  className="w-full py-2 mb-3 bg-brand-orange/10 text-brand-orange rounded-xl font-bold hover:bg-brand-orange/20 transition-colors flex items-center justify-center gap-2"
-                >
-                  <Star size={16} />
-                  {item.reviews?.length ? `See ${item.reviews.length} Reviews` : "Write a Review"}
-                </button>
-              </div>
-
-              <div className="mt-auto">
-                {item.available ? (
+                <div className="mt-auto flex items-center gap-3">
                   <button
-                    onClick={() => handleAddToCart(item)}
-                    className="w-full py-3 bg-brand-dark text-white rounded-xl font-bold hover:bg-brand-orange transition-colors flex items-center justify-center gap-2 group-hover:shadow-lg"
+                    onClick={() => handleOpenReviews(item)}
+                    className="flex-1 h-10 bg-brand-orange/10 text-brand-orange rounded-lg font-bold hover:bg-brand-orange/20 transition-colors flex items-center justify-center gap-2 text-xs uppercase tracking-wide"
                   >
-                    <span>ADD</span>
-                    <span className="bg-white/20 w-5 h-5 rounded-full flex items-center justify-center text-xs">
-                      <Plus size={12} />
-                    </span>
+                    <Star size={14} />
+                    {item.reviews?.length ? `${item.reviews.length} Reviews` : "Write Review"}
                   </button>
-                ) : (
-                  <button
-                    disabled
-                    className="w-full py-3 bg-gray-100 text-gray-400 rounded-xl font-bold cursor-not-allowed"
-                  >
-                    UNAVAILABLE
-                  </button>
-                )}
+
+                  <div className="flex-1 flex justify-end">
+                    {item.available ? (
+                      qty > 0 ? (
+                        <div className="flex items-center justify-between bg-brand-orange text-white rounded-lg font-bold shadow-md transition-all w-full h-10">
+                          <button
+                            onClick={() => {
+                              if (qty === 1) {
+                                handleAddToCart(item, -1);
+                              } else {
+                                handleAddToCart(item, -1);
+                              }
+                            }}
+                            className="w-8 h-full flex items-center justify-center hover:bg-black/10 rounded-l-lg transition-colors"
+                          >
+                            <span className="text-xl leading-none mb-1">-</span>
+                          </button>
+                          <span className="text-sm font-black flex-1 text-center">{qty}</span>
+                          <button
+                            onClick={() => handleAddToCart(item, 1)}
+                            className="w-8 h-full flex items-center justify-center hover:bg-black/10 rounded-r-lg transition-colors"
+                          >
+                            <span className="text-xl leading-none mb-1">+</span>
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => handleAddToCart(item, 1)}
+                          className="w-full h-10 bg-white text-brand-orange border border-brand-orange rounded-lg font-bold hover:bg-brand-orange hover:text-white transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md"
+                        >
+                          <span className="text-sm font-black">ADD</span>
+                        </button>
+                      )
+                    ) : (
+                      <button
+                        disabled
+                        className="w-full h-10 bg-gray-100 text-gray-400 rounded-lg font-bold cursor-not-allowed text-xs"
+                      >
+                        UNAVAILABLE
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </main>
 
@@ -337,7 +378,6 @@ export default function MenuPage() {
                       </div>
                     </div>
                     <p className="text-gray-600 text-sm">{review.comment}</p>
-                    {/* Add delete button if current user owns the review (logic needed) */}
                   </div>
                 ))
               )}

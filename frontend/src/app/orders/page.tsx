@@ -40,70 +40,86 @@ export default function OrdersPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-brand-bg">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-orange"></div>
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-orange"></div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-brand-bg font-sans p-4 md:p-8 max-w-3xl mx-auto">
-            <header className="flex justify-between items-center mb-8">
-                <Link href="/menu" className="flex items-center gap-2 text-brand-dark font-bold hover:text-brand-orange transition-colors">
-                    <ArrowLeft size={24} /> Back to Menu
-                </Link>
-                <h1 className="text-3xl font-black text-brand-dark">MY ORDERS</h1>
-            </header>
+        <div className="min-h-screen bg-gray-50 font-sans pb-24">
+            {/* Header */}
+            <div className="bg-white pt-8 pb-6 px-6 sticky top-0 z-20 border-b border-gray-100/50 backdrop-blur-xl bg-white/80">
+                <div className="max-w-2xl mx-auto flex justify-between items-center">
+                    <Link href="/menu" className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-brand-dark hover:bg-brand-orange hover:text-white transition-all">
+                        <ArrowLeft size={20} />
+                    </Link>
+                    <h1 className="text-xl font-black text-brand-dark tracking-tight">YOUR ORDERS</h1>
+                    <div className="w-10"></div> {/* Spacer for balance */}
+                </div>
+            </div>
 
-            <div className="space-y-4">
+            <div className="max-w-2xl mx-auto px-4 mt-6 space-y-4">
                 {orders.map((order) => (
-                    <Link href={`/order/${order.id}`} key={order.id} className="block">
-                        <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 hover:shadow-md transition-all group">
-                            <div className="flex justify-between items-start mb-4">
-                                <div>
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <span className="text-xs font-mono text-gray-400">#{order.id.slice(-6)}</span>
-                                        <span className="text-xs text-gray-400">• {new Date(order.createdAt).toLocaleDateString()}</span>
-                                    </div>
-                                    <h3 className="font-bold text-xl text-brand-dark">₹{order.amount}</h3>
+                    <Link href={`/order/${order.id}`} key={order.id} className="block group">
+                        <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+
+                            {/* Top Row: Date & Status */}
+                            <div className="flex justify-between items-center mb-4">
+                                <div className="flex items-center gap-2">
+                                    <div className={`w-2 h-2 rounded-full ${order.orderStatus === 'READY' ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`}></div>
+                                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                                        {new Date(order.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                    </span>
                                 </div>
-                                <div className="flex flex-col items-end gap-2">
-                                    <span className={`px-3 py-1 rounded-full text-xs font-black ${order.orderStatus === "READY" ? "bg-green-100 text-green-700" :
+                                <span className={`text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider ${order.orderStatus === "READY" ? "bg-green-100 text-green-700" :
                                         order.orderStatus === "IN_PROGRESS" ? "bg-blue-100 text-blue-700" :
-                                            "bg-brand-yellow/20 text-brand-dark"
-                                        }`}>
-                                        {order.orderStatus}
-                                    </span>
-                                    <span className={`text-xs font-bold ${order.paymentStatus === "VERIFIED" ? "text-green-500" :
-                                        order.paymentStatus === "FAILED" ? "text-red-500" :
-                                            "text-brand-orange"
-                                        }`}>
-                                        {order.paymentStatus}
-                                    </span>
+                                            "bg-gray-100 text-gray-500"
+                                    }`}>
+                                    {order.orderStatus.replace("_", " ")}
+                                </span>
+                            </div>
+
+                            {/* Middle Row: Items & Price */}
+                            <div className="flex justify-between items-end mb-4">
+                                <div className="space-y-1 flex-1">
+                                    <h3 className="text-lg font-bold text-brand-dark leading-tight">
+                                        {order.items.map(i => i.item.name).slice(0, 2).join(", ")}
+                                        {order.items.length > 2 && <span className="text-gray-400 font-normal"> +{order.items.length - 2} more</span>}
+                                    </h3>
+                                    <p className="text-sm text-gray-400 font-medium">Order #{order.id.slice(-4).toUpperCase()}</p>
+                                </div>
+                                <div className="text-right">
+                                    <span className="block text-2xl font-black text-brand-dark tracking-tight">₹{order.amount}</span>
                                 </div>
                             </div>
 
-                            <div className="space-y-1">
-                                {order.items.map((item, idx) => (
-                                    <div key={idx} className="flex justify-between text-sm text-gray-600">
-                                        <span>{item.item.name}</span>
-                                        <span className="font-bold">x{item.qty}</span>
-                                    </div>
-                                ))}
+                            {/* Bottom Row: Action Hint */}
+                            <div className="pt-4 border-t border-gray-50 flex justify-between items-center group-hover:border-gray-100 transition-colors">
+                                <span className={`text-xs font-bold flex items-center gap-1 ${order.paymentStatus === "VERIFIED" ? "text-green-600" :
+                                        order.paymentStatus === "FAILED" ? "text-red-500" : "text-brand-orange"
+                                    }`}>
+                                    {order.paymentStatus === "VERIFIED" ? "Paid via UPI" : "Payment Pending"}
+                                </span>
+                                <span className="text-xs font-bold text-gray-400 group-hover:text-brand-orange transition-colors flex items-center gap-1">
+                                    View Receipt <ArrowLeft size={14} className="rotate-180" />
+                                </span>
                             </div>
                         </div>
                     </Link>
                 ))}
 
                 {orders.length === 0 && (
-                    <div className="text-center py-20">
-                        <div className="text-6xl mb-4 text-gray-300 flex justify-center">
-                            <UtensilsCrossed size={64} />
+                    <div className="text-center py-32 px-6">
+                        <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300">
+                            <UtensilsCrossed size={40} />
                         </div>
-                        <h2 className="text-2xl font-bold text-brand-dark mb-2">No orders yet</h2>
-                        <p className="text-gray-400 mb-8">Hungry? Order something delicious!</p>
-                        <Link href="/menu" className="bg-brand-dark text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-orange transition-colors shadow-lg">
-                            Browse Menu
+                        <h2 className="text-2xl font-black text-brand-dark mb-2">No Past Orders</h2>
+                        <p className="text-gray-400 mb-8 max-w-xs mx-auto text-sm leading-relaxed">
+                            It feels a bit empty here. Why not fill it with some delicious memories?
+                        </p>
+                        <Link href="/menu" className="bg-brand-dark text-white px-8 py-4 rounded-2xl font-bold hover:bg-brand-orange transition-all shadow-xl shadow-brand-dark/20 inline-flex items-center gap-2">
+                            Explore Menu <ArrowLeft size={18} className="rotate-180" />
                         </Link>
                     </div>
                 )}

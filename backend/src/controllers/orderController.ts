@@ -6,6 +6,7 @@ import { emitNewOrder, emitOrderUpdate } from "../utils/socketEmitter.js";
 export const createOrder = async (req: AuthRequest, res: Response) => {
   try {
     const { items, amount, utr } = req.body;
+    console.log("createOrder received body:", JSON.stringify(req.body, null, 2));
 
     if (!items || items.length === 0) {
       return res.status(400).json({ error: "Items are required" });

@@ -24,12 +24,56 @@ export default function Home() {
     }
   };
 
+  // Ensure exactly 21 items (3 sets of 7) for perfect loop
+  const [foodItems] = useState([
+    // Set 1
+    { name: "Samosa", img: "/images/food/samosa.png" },
+    { name: "Chai", img: "/images/food/chai.png" },
+    { name: "Fries", img: "/images/food/fries.png" },
+    { name: "Sandwich", img: "/images/food/sandwich.png" },
+    { name: "Pasta", img: "/images/food/pasta.png" },
+    { name: "Cold Coffee", img: "/images/food/cold-coffee.png" },
+    { name: "Pizza", img: "/images/food/pizza.png" },
+    // Set 2
+    { name: "Burger", img: "/images/food/burger.png" },
+    { name: "Momo", img: "/images/food/momo.png" },
+    { name: "Dosa", img: "/images/food/dosa.png" },
+    { name: "Cake", img: "/images/food/cake.png" },
+    { name: "Ice Cream", img: "/images/food/ice-cream.png" },
+    { name: "Salad", img: "/images/food/salad.png" },
+    { name: "Vada Pav", img: "/images/food/samosa.png" }, // Reusing samosa image as placeholder
+    // Set 3 (More variety + mix)
+    { name: "Masala Chai", img: "/images/food/chai.png" },
+    { name: "Cheese Sandwich", img: "/images/food/sandwich.png" },
+    { name: "Red Pasta", img: "/images/food/pasta.png" },
+    { name: "Iced Tea", img: "/images/food/cold-coffee.png" },
+    { name: "Veg Pizza", img: "/images/food/pizza.png" },
+    { name: "Fried Rice", img: "/images/food/momo.png" }, // Placeholder
+    { name: "Noodles", img: "/images/food/fork.png" },  // Placeholder
+  ]);
+
+  const [startIndex, setStartIndex] = useState(0);
+
+  const nextSlide = () => {
+    setStartIndex((prev) => (prev + 7) % foodItems.length);
+  };
+
+  const prevSlide = () => {
+    setStartIndex((prev) => (prev - 7 + foodItems.length) % foodItems.length);
+  };
+
+  // Get exactly 7 visible items with infinite wrap-around
+  const visibleItems = [];
+  for (let i = 0; i < 7; i++) {
+    visibleItems.push(foodItems[(startIndex + i) % foodItems.length]);
+  }
+
   return (
     <main className="min-h-screen p-4 md:p-8 max-w-7xl mx-auto space-y-12">
       <Navbar />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 bg-gradient-to-br from-[#FFF8E7] to-[#E6D5B8] rounded-[2.5rem] p-6 md:p-12 relative overflow-hidden min-h-[300px] md:min-h-[500px] flex flex-col justify-center group shadow-sm">
+        <div className="md:col-span-2 bg-gradient-to-br from-[#FFF8E7] to-[#E6D5B8] rounded-[2.5rem] p-6 md:p-12 relative overflow-hidden min-h-[300px] md:min-h-[500px] flex flex-col justify-center group shadow-sm transition-all hover:shadow-md">
           <div className="relative z-10 max-w-lg transition-transform duration-500 group-hover:scale-105">
             <div className="flex gap-2 mb-4">
               <span className="bg-brand-dark/5 backdrop-blur-sm px-4 py-1 rounded-full text-sm font-bold text-brand-dark flex items-center gap-2">
@@ -136,14 +180,14 @@ export default function Home() {
           </h2>
           <div className="flex gap-2">
             <button
-              onClick={() => scroll('left')}
-              className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors disabled:opacity-50"
+              onClick={prevSlide}
+              className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors active:scale-95"
             >
               <ChevronLeft size={20} className="text-gray-600" />
             </button>
             <button
-              onClick={() => scroll('right')}
-              className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors disabled:opacity-50"
+              onClick={nextSlide}
+              className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors active:scale-95"
             >
               <ChevronRight size={20} className="text-gray-600" />
             </button>
@@ -151,28 +195,18 @@ export default function Home() {
         </div>
 
         <div
-          ref={scrollRef}
-          className="flex gap-8 overflow-x-auto pb-8 px-4 scrollbar-hide scroll-smooth"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          className="grid grid-cols-2 md:grid-cols-7 gap-4 md:gap-8 pb-8 px-4"
         >
-          {[
-            { name: "Pizza", img: "/images/food/pizza.png" },
-            { name: "Momo", img: "/images/food/momo.png" },
-            { name: "Dosa", img: "/images/food/dosa.png" },
-            { name: "Burger", img: "/images/food/burger.png" },
-            { name: "Cake", img: "/images/food/cake.png" },
-            { name: "Ice Cream", img: "/images/food/ice-cream.png" },
-            { name: "Salad", img: "/images/food/salad.png" },
-          ].map((item, i) => (
-            <div key={i} className="flex flex-col items-center gap-3 min-w-[120px] cursor-pointer group">
-              <div className="w-32 h-32 md:w-40 md:h-40 relative rounded-full overflow-hidden shadow-md group-hover:shadow-xl transition-all duration-300">
+          {visibleItems.map((item, i) => (
+            <div key={`${item.name}-${startIndex}-${i}`} className="flex flex-col items-center gap-3 cursor-pointer group animate-fade-in-right">
+              <div className="w-24 h-24 md:w-32 md:h-32 relative rounded-full overflow-hidden shadow-md group-hover:shadow-xl transition-all duration-300 border-4 border-white mx-auto">
                 <img
                   src={item.img}
                   alt={item.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
               </div>
-              <span className="font-bold text-brand-dark text-lg group-hover:text-brand-orange transition-colors">
+              <span className="font-bold text-brand-dark text-base md:text-lg group-hover:text-brand-orange transition-colors text-center block">
                 {item.name}
               </span>
             </div>

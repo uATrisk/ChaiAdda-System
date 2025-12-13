@@ -5,6 +5,7 @@ import { API_URL } from "@/lib/api";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import QRCode from "react-qr-code";
 import { ArrowLeft, CreditCard, Wallet, Banknote, Coffee } from "lucide-react";
 
 export default function CheckoutPage() {
@@ -54,12 +55,23 @@ export default function CheckoutPage() {
         body: JSON.stringify({ items, amount: total, utr }),
       });
 
-      const data = await res.json();
+      console.log("Response status:", res.status, res.statusText);
+      const text = await res.text();
+      console.log("Raw response:", text);
+
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        console.error("Failed to parse JSON:", e);
+        data = { error: "Invalid server response" };
+      }
 
       if (!res.ok) {
         console.error("Order placement failed:", data);
         setLoading(false);
-        setErrorMsg(data.error || "Failed to place order. Please try again.");
+        // If data.error is missing (e.g. empty JSON {}), show status code
+        setErrorMsg(data.error || `Order failed (${res.status}): Please try again.`);
         return;
       }
 
@@ -151,8 +163,13 @@ export default function CheckoutPage() {
               <div className="text-center">
                 <p className="text-brand-dark/70 font-medium text-sm">OR SCAN QR CODE</p>
                 <div className="mt-4 bg-white p-4 rounded-xl inline-block shadow-sm">
-                  <div className="w-32 h-32 bg-gray-200 flex items-center justify-center text-xs text-gray-500">
-                    QR CODE
+                  <div className="w-32 h-32 bg-white flex items-center justify-center">
+                    <QRCode
+                      value={upiLink}
+                      size={128}
+                      style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                      viewBox={`0 0 128 128`}
+                    />
                   </div>
                 </div>
                 <p className="mt-2 font-mono text-brand-dark font-bold">{upiId}</p>

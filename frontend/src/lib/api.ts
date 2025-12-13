@@ -1,5 +1,12 @@
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+if (process.env.NODE_ENV === "production" && API_URL.includes("localhost")) {
+  console.warn(
+    "WARNING: You are running in production mode but connecting to localhost. " +
+    "Please set the NEXT_PUBLIC_API_URL environment variable."
+  );
+}
+
 export async function apiGet(path: string) {
   const token = localStorage.getItem("token");
   const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};

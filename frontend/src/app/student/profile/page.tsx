@@ -227,6 +227,18 @@ export default function ProfilePage() {
 
             {currentView === "MENU" ? (
                 <div className="space-y-6">
+                    <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 text-center">
+                        <div className="w-20 h-20 bg-brand-orange/10 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-orange font-black text-2xl uppercase">
+                            {user?.name?.[0] || "U"}
+                        </div>
+                        <h2 className="text-xl font-bold text-brand-dark mb-1">
+                            {user?.name || "User"}
+                        </h2>
+                        <p className="text-gray-500 font-medium text-sm">
+                            You are logged in as <span className="text-brand-orange">{user?.email}</span>
+                        </p>
+                    </div>
+
                     <div className="bg-white rounded-[2rem] overflow-hidden shadow-sm border border-gray-100">
                         <MenuItem icon={User} label="Change Name" onClick={() => setCurrentView("NAME")} />
                         <MenuItem icon={Phone} label="Change Mobile Number / Email" onClick={() => setCurrentView("CONTACT")} />
