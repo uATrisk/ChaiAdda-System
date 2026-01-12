@@ -32,8 +32,11 @@ export const signup = async (req: Request, res: Response) => {
       user: { id: user.id, name: user.name, email: user.email, role: user.role }
     });
   } catch (error) {
-    console.error("Signup error:", error);
-    return res.status(500).json({ error: "Server error" });
+    console.error("Signup error detailed:", error);
+    if (error instanceof Error) {
+      console.error("Stack:", error.stack);
+    }
+    return res.status(500).json({ error: "Server error", details: error instanceof Error ? error.message : String(error) });
   }
 };
 

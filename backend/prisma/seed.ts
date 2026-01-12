@@ -3,16 +3,28 @@ import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 
-const categories = {
-    "Tea & Coffee": "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=800&q=80",
-    "Chocolate & Bournvita": "https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?auto=format&fit=crop&w=800&q=80",
-    "Shakes & Juices": "https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=800&q=80",
-    "Burgers": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80",
-    "Sandwiches": "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?auto=format&fit=crop&w=800&q=80",
-    "Maggi": "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?auto=format&fit=crop&w=800&q=80",
-    "Wraps": "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=800&q=80",
-    "Snacks": "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=800&q=80",
-    "Extras": "https://images.unsplash.com/photo-1576107232684-1279f390859f?auto=format&fit=crop&w=800&q=80",
+const getImageForItem = (name: string, category: string) => {
+    const lowerName = name.toLowerCase();
+
+    if (category === "Burgers") return "/images/food/burger.png";
+    if (category === "Sandwiches") return "/images/food/sandwich.png";
+    if (category === "Tea & Coffee") {
+        if (lowerName.includes("cold")) return "/images/food/cold-coffee.png";
+        if (lowerName.includes("masala")) return "/images/food/masala-chai.png";
+        return "/images/food/chai.png";
+    }
+    if (category === "Snacks") {
+        if (lowerName.includes("momo")) return "/images/food/momo.png";
+        if (lowerName.includes("fries")) return "/images/food/fries.png";
+        if (lowerName.includes("pizza")) return "/images/food/pizza.png";
+        if (lowerName.includes("samosa")) return "/images/food/samosa.png";
+        return "/images/food/fries.png"; // Fallback for snacks
+    }
+    if (category === "Maggi") return "/images/food/pasta.png"; // Closest lookalike
+    if (category === "Wraps") return "/images/food/dosa.png"; // Closest lookalike or placeholder
+
+    // Default fallbacks
+    return "/images/food/chai.png";
 };
 
 const menuItems = [
@@ -117,7 +129,7 @@ async function main() {
                 name: item.name,
                 price: item.price,
                 category: item.category,
-                image: categories[item.category as keyof typeof categories],
+                image: getImageForItem(item.name, item.category),
                 available: true,
             },
         });

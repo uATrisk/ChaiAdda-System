@@ -58,8 +58,13 @@ app.use("/reviews", reviewRoutes);
 app.use("/uploads", express.static("uploads"));
 
 
+app.use((req, res, next) => {
+  console.log(`Incoming request: ${req.method} ${req.url} from origin: ${req.headers.origin}`);
+  next();
+});
+
 app.get("/", (req, res) => {
-  res.send("Backend is running");
+  res.send("Backend is running properly. If you see this, the server is reachable.");
 });
 
 app.get("/test-db", async (req, res) => {

@@ -1,4 +1,5 @@
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+console.log("Using API URL:", API_URL);
 
 if (process.env.NODE_ENV === "production" && API_URL.includes("localhost")) {
   console.warn(
